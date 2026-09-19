@@ -2,7 +2,11 @@
   "cartas": [
     {
       "apartado": "gradeadas",
-      "foto": "",
+      "foto": "https://picsum.photos/id/102/1920/1280.webp",
+      "fotos": [
+        "https://picsum.photos/id/927/1920/1280.webp",
+        "https://picsum.photos/id/258/1920/1280.webp"
+      ],
       "nombre": "Pikachu Illustrator",
       "set": "Promo · BGS 9",
       "juego": "Pokémon",
@@ -14,6 +18,7 @@
     {
       "apartado": "sueltas",
       "foto": "",
+      "fotos": [],
       "nombre": "ff",
       "set": "",
       "juego": "",
@@ -25,6 +30,7 @@
     {
       "apartado": "gradeadas",
       "foto": "",
+      "fotos": [],
       "nombre": "hh",
       "set": "",
       "juego": "",
