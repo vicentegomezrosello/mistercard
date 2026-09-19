@@ -59,6 +59,11 @@
   .ap-num{font:700 12px Manrope,sans-serif;color:#e0a84e;background:rgba(224,168,78,.13);border:1px solid rgba(224,168,78,.34);padding:2px 9px;border-radius:100px}
   .ph{position:relative;aspect-ratio:63/88;background:repeating-linear-gradient(135deg,transparent,transparent 8px,rgba(244,236,224,.045) 8px,rgba(244,236,224,.045) 9px),linear-gradient(160deg,#1a2f4e,#101f36);display:flex;align-items:center;justify-content:center;font:11px ui-monospace,monospace;color:rgba(244,236,224,.3)}
   .ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  /* Varias fotos por producto: se pasan tocando la imagen. */
+  .ph.multi{cursor:pointer}
+  .puntos{position:absolute;bottom:9px;left:50%;transform:translateX(-50%);display:flex;gap:5px;z-index:2;background:rgba(10,20,36,.55);padding:5px 7px;border-radius:100px}
+  .puntos i{width:6px;height:6px;border-radius:50%;background:rgba(244,236,224,.4);transition:background .15s}
+  .puntos i.on{background:#e0a84e}
   .tag{position:absolute;top:11px;left:11px;background:rgba(10,20,36,.82);border:1px solid rgba(244,236,224,.14);color:#c6d0de;font-size:11px;font-weight:700;padding:4px 9px;border-radius:100px}
   .st{position:absolute;top:11px;right:11px;font-size:11px;font-weight:800;padding:4px 8px;border-radius:6px}
   .body{padding:14px 15px;display:flex;flex-direction:column;gap:5px;flex:1}
@@ -230,15 +235,28 @@ const APKEYS = ['gradeadas', 'sellado', 'sueltas', 'lotes'];
 const APNOM = { gradeadas: 'Cartas gradeadas', sellado: 'Producto sellado', sueltas: 'Cartas sueltas', lotes: 'Lotes y colecciones' };
 const RATIO = { gradeadas: '63/88', sueltas: '63/88', sellado: '1/1', lotes: '1/1' };
 
+// Devuelve todas las fotos de un producto: la principal primero, luego las extra.
+function fotosDe(c) {
+  const extra = Array.isArray(c.fotos)
+    ? c.fotos.map(f => typeof f === 'string' ? f : (f && (f.img || f.foto)))
+    : [];
+  return [c.foto, ...extra].filter(Boolean);
+}
+
 function cardHTML(c, ratio) {
   const [bg, fg] = ST[c.disponibilidad] || ST.Disponible;
-  const foto = c.foto ? `<img src="${esc(c.foto)}" alt="${esc(c.nombre)}" loading="lazy">` : 'foto del producto';
+  const imgs = fotosDe(c);
+  const foto = imgs.length ? `<img src="${esc(imgs[0])}" alt="${esc(c.nombre)}" loading="lazy">` : 'foto del producto';
+  const puntos = imgs.length > 1
+    ? `<span class="puntos">${imgs.map((_, i) => `<i${i === 0 ? ' class="on"' : ''}></i>`).join('')}</span>`
+    : '';
   const juego = c.juego ? `<span class="tag">${esc(c.juego)}</span>` : '';
   const estado = c.estado_carta ? `<div style="display:flex;align-items:center;gap:7px;margin-top:2px"><span style="width:7px;height:7px;border-radius:50%;background:${COND(c.estado_carta)}"></span><span style="font-size:12px;font-weight:600;color:#9aa8bd">${esc(c.estado_carta)}</span></div>` : '';
   return `<article class="item">
-    <div class="ph" style="aspect-ratio:${ratio}">${foto}
+    <div class="ph${imgs.length > 1 ? ' multi' : ''}" style="aspect-ratio:${ratio}" data-fotos="${esc(JSON.stringify(imgs))}" data-i="0">${foto}
       ${juego}
       <span class="st" style="background:${bg};color:${fg}">${esc(c.disponibilidad)}</span>
+      ${puntos}
     </div>
     <div class="body">
       <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px">
@@ -293,6 +311,19 @@ function pintaApartados() {
   const cont = document.getElementById('apartados');
   cont.innerHTML = html || '<p style="color:#9aa8bd">Ahora mismo no hay nada publicado. Vuelve pronto.</p>';
   cont.querySelectorAll('.ig').forEach(x => x.href = window.__ig || '#');
+  // Tocar la foto pasa a la siguiente del producto.
+  cont.querySelectorAll('.ph.multi').forEach(ph => {
+    ph.addEventListener('click', () => {
+      let lista = [];
+      try { lista = JSON.parse(ph.dataset.fotos || '[]'); } catch (e) { return; }
+      if (lista.length < 2) return;
+      const n = (parseInt(ph.dataset.i, 10) + 1) % lista.length;
+      ph.dataset.i = n;
+      const img = ph.querySelector('img');
+      if (img) img.src = lista[n];
+      ph.querySelectorAll('.puntos i').forEach((p, i) => p.classList.toggle('on', i === n));
+    });
+  });
 }
 
 (async () => {
