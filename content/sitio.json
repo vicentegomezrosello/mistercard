@@ -19,6 +19,23 @@
   "destacada_set": "Evolving Skies",
   "destacada_precio": "310 €",
   "destacada_foto": "",
+  "columnas": "4",
+  "como_titulo": "Cómo comprar",
+  "como_texto": "Tres pasos, todo por mensaje directo.",
+  "pasos": [
+    {
+      "titulo": "Me escribes por Instagram",
+      "texto": "Con la referencia (MC-014) o una captura de la carta que quieres."
+    },
+    {
+      "titulo": "Te confirmo y reservo",
+      "texto": "Estado real, fotos extra si las pides y precio final con envío."
+    },
+    {
+      "titulo": "Pagas y sale el paquete",
+      "texto": "Bizum o transferencia. Envío protegido con seguimiento en 24-48 h."
+    }
+  ],
   "compro_titulo": "También compro colecciones",
   "compro_texto": "Mándame fotos del lote por Instagram y te digo qué me interesa y a qué precio. Sin compromiso y sin tasaciones eternas.",
   "feed": []
