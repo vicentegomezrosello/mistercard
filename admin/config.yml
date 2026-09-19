@@ -75,7 +75,14 @@ collections:
                   - { label: "Producto sellado", value: "sellado" }
                   - { label: "Cartas sueltas", value: "sueltas" }
                   - { label: "Lotes y colecciones", value: "lotes" }
-              - { label: "Foto", name: foto, widget: image, required: false }
+              - { label: "Foto principal", name: foto, widget: image, required: false }
+              - label: "Más fotos (reverso, detalles…)"
+                name: fotos
+                widget: list
+                required: false
+                label_singular: "Foto"
+                hint: "Opcional. En la web se pasan tocando la imagen. Sin límite."
+                field: { label: Foto, name: img, widget: image }
               - { label: "Nombre", name: nombre, widget: string }
               - { label: "Set / detalle", name: set, widget: string, required: false }
               - { label: "Juego", name: juego, widget: select, required: false, options: ["Pokémon", "Magic", "Yu-Gi-Oh!", "One Piece", "Lorcana", "Deportivas", "Otro"] }
