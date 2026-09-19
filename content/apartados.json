@@ -2,7 +2,7 @@
   "gradeadas": {
     "nombre": "Cartas gradeadas",
     "visible": true,
-    "orden": 3
+    "orden": 1
   },
   "sellado": {
     "nombre": "Producto sellado",
