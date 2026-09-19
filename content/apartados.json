@@ -6,7 +6,7 @@
   },
   "sellado": {
     "nombre": "Producto sellado",
-    "visible": false,
+    "visible": true,
     "orden": 2
   },
   "sueltas": {
@@ -17,6 +17,6 @@
   "lotes": {
     "nombre": "Lotes y colecciones",
     "visible": true,
-    "orden": 5
+    "orden": 4
   }
 }
