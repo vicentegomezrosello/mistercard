@@ -1,0 +1,9 @@
+{
+  // Configuración para publicar mistercard en Cloudflare Workers.
+  // Es un sitio 100% estático: no hay código, solo se sirven los archivos del repositorio.
+  "name": "mistercard",
+  "compatibility_date": "2026-09-19",
+  "assets": {
+    "directory": "./"
+  }
+}
