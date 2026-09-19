@@ -2,7 +2,7 @@
 # Solo cambia TU-USUARIO por tu usuario real de GitHub.
 backend:
   name: github
-  repo: vicentegomezrosello/mistercard-web
+  repo: vicentegomezrosello/mistercard
   branch: main
   auth_methods: [token]
 
