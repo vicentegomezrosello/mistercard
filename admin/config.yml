@@ -1,13 +1,13 @@
-# Sveltia CMS usa por defecto el OAuth de Netlify: no hace falta base_url ni auth_endpoint.
+# Login con token personal de GitHub (no requiere configurar OAuth en Netlify).
 # Solo cambia TU-USUARIO por tu usuario real de GitHub.
 backend:
   name: github
-  repo: vicentegomezrosello/mistercard
+  repo: TU-USUARIO/mistercard-web
   branch: main
   auth_methods: [token]
 
-site_url: https://mistercard.es
-display_url: https://mistercard.es
+site_url: https://TU-DOMINIO.com
+display_url: https://TU-DOMINIO.com
 locale: es
 
 media_folder: "images"
@@ -111,6 +111,28 @@ collections:
           - { label: "Carta destacada · set", name: destacada_set, widget: string }
           - { label: "Carta destacada · precio", name: destacada_precio, widget: string }
           - { label: "Carta destacada · foto", name: destacada_foto, widget: image, required: false }
+          - label: "Cartas por fila (en ordenador)"
+            name: columnas
+            widget: select
+            default: "4"
+            hint: "Cuántos productos se ven en cada fila. En móvil se ajusta solo (1 o 2)."
+            options:
+              - { label: "2 por fila (muy grandes)", value: "2" }
+              - { label: "3 por fila (grandes)", value: "3" }
+              - { label: "4 por fila (recomendado)", value: "4" }
+              - { label: "5 por fila (pequeñas)", value: "5" }
+              - { label: "6 por fila (muy pequeñas)", value: "6" }
+          - { label: "Cómo comprar · título", name: como_titulo, widget: string }
+          - { label: "Cómo comprar · texto de entrada", name: como_texto, widget: string }
+          - label: "Cómo comprar · pasos"
+            name: pasos
+            widget: list
+            label_singular: "Paso"
+            summary: "{{fields.titulo}}"
+            hint: "La numeración (01, 02, 03…) se pone sola. Arrastra para reordenar."
+            fields:
+              - { label: "Título del paso", name: titulo, widget: string }
+              - { label: "Explicación", name: texto, widget: text }
           - { label: "Compro colecciones · título", name: compro_titulo, widget: string }
           - { label: "Compro colecciones · texto", name: compro_texto, widget: text }
           - label: "Fotos del feed (cuadradas)"
