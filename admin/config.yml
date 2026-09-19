@@ -6,8 +6,8 @@ backend:
   branch: main
   auth_methods: [token]
 
-site_url: https://TU-DOMINIO.com
-display_url: https://TU-DOMINIO.com
+site_url: https://mistercard.es
+display_url: https://mistercard.es
 locale: es
 
 media_folder: "images"
