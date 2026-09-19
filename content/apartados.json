@@ -16,7 +16,7 @@
   },
   "lotes": {
     "nombre": "Lotes y colecciones",
-    "visible": false,
+    "visible": true,
     "orden": 4
   }
 }
