@@ -1,0 +1,22 @@
+{
+  "gradeadas": {
+    "nombre": "Cartas gradeadas",
+    "visible": true,
+    "orden": 1
+  },
+  "sellado": {
+    "nombre": "Producto sellado",
+    "visible": false,
+    "orden": 2
+  },
+  "sueltas": {
+    "nombre": "Cartas sueltas",
+    "visible": true,
+    "orden": 3
+  },
+  "lotes": {
+    "nombre": "Lotes y colecciones",
+    "visible": false,
+    "orden": 4
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "cartas": [
+    {
+      "apartado": "gradeadas",
+      "nombre": "Umbreon VMAX (Alt Art)",
+      "set": "Evolving Skies · 215/203",
+      "juego": "Pokémon",
+      "estado_carta": "PSA 10",
+      "precio": "310 €",
+      "disponibilidad": "Disponible",
+      "ref": "MC-014",
+      "foto": ""
+    },
+    {
+      "apartado": "sueltas",
+      "nombre": "Charizard ex",
+      "set": "Pokémon 151 · 199/165",
+      "juego": "Pokémon",
+      "estado_carta": "Near Mint",
+      "precio": "89 €",
+      "disponibilidad": "Disponible",
+      "ref": "MC-021",
+      "foto": ""
+    },
+    {
+      "apartado": "sueltas",
+      "nombre": "Ragavan, Nimble Pilferer",
+      "set": "Modern Horizons 2",
+      "juego": "Magic",
+      "estado_carta": "Near Mint",
+      "precio": "42 €",
+      "disponibilidad": "Reservada",
+      "ref": "MC-033",
+      "foto": ""
+    },
+    {
+      "apartado": "sueltas",
+      "nombre": "Blue-Eyes White Dragon",
+      "set": "Legend of Blue Eyes",
+      "juego": "Yu-Gi-Oh!",
+      "estado_carta": "Light Play",
+      "precio": "120 €",
+      "disponibilidad": "Disponible",
+      "ref": "MC-007",
+      "foto": ""
+    },
+    {
+      "apartado": "sueltas",
+      "nombre": "Monkey D. Luffy (Leader)",
+      "set": "One Piece OP-01",
+      "juego": "One Piece",
+      "estado_carta": "Near Mint",
+      "precio": "34 €",
+      "disponibilidad": "Disponible",
+      "ref": "MC-042",
+      "foto": ""
+    },
+    {
+      "apartado": "sueltas",
+      "nombre": "Mox Diamond",
+      "set": "Stronghold",
+      "juego": "Magic",
+      "estado_carta": "Good",
+      "precio": "78 €",
+      "disponibilidad": "Disponible",
+      "ref": "MC-028",
+      "foto": ""
+    },
+    {
+      "apartado": "sueltas",
+      "nombre": "Dark Magician Girl",
+      "set": "Magician’s Force",
+      "juego": "Yu-Gi-Oh!",
+      "estado_carta": "Excellent",
+      "precio": "65 €",
+      "disponibilidad": "Reservada",
+      "ref": "MC-019",
+      "foto": ""
+    },
+    {
+      "apartado": "gradeadas",
+      "nombre": "Pikachu Illustrator",
+      "set": "Promo · BGS 9",
+      "juego": "Pokémon",
+      "estado_carta": "BGS 9",
+      "precio": "2.400 €",
+      "disponibilidad": "Vendida",
+      "ref": "MC-001",
+      "foto": ""
+    }
+  ]
+}

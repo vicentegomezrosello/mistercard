@@ -1,0 +1,119 @@
+# Sveltia CMS usa por defecto el OAuth de Netlify: no hace falta base_url ni auth_endpoint.
+# Solo cambia TU-USUARIO por tu usuario real de GitHub.
+backend:
+  name: github
+  repo: TU-USUARIO/mistercard-web
+  branch: main
+
+site_url: https://TU-DOMINIO.com
+display_url: https://TU-DOMINIO.com
+locale: es
+
+media_folder: "images"
+public_folder: "/images"
+
+collections:
+  # ENCENDER / APAGAR APARTADOS. Un apartado solo se ve en la web si "Mostrar" está activado
+  # Y tiene al menos un producto asignado. Cambia el orden para reordenar las secciones.
+  - name: apartados
+    label: "Apartados (encender / apagar)"
+    files:
+      - name: visibilidad
+        label: "Apartados del escaparate"
+        file: "content/apartados.json"
+        fields:
+          - label: "Cartas gradeadas"
+            name: gradeadas
+            widget: object
+            fields:
+              - { label: "Nombre visible en la web", name: nombre, widget: string, default: "Cartas gradeadas" }
+              - { label: "Mostrar en la web", name: visible, widget: boolean, default: true }
+              - { label: "Orden", name: orden, widget: number, default: 1, value_type: int, min: 1 }
+          - label: "Producto sellado"
+            name: sellado
+            widget: object
+            fields:
+              - { label: "Nombre visible en la web", name: nombre, widget: string, default: "Producto sellado" }
+              - { label: "Mostrar en la web", name: visible, widget: boolean, default: false }
+              - { label: "Orden", name: orden, widget: number, default: 2, value_type: int, min: 1 }
+          - label: "Cartas sueltas"
+            name: sueltas
+            widget: object
+            fields:
+              - { label: "Nombre visible en la web", name: nombre, widget: string, default: "Cartas sueltas" }
+              - { label: "Mostrar en la web", name: visible, widget: boolean, default: true }
+              - { label: "Orden", name: orden, widget: number, default: 3, value_type: int, min: 1 }
+          - label: "Lotes y colecciones"
+            name: lotes
+            widget: object
+            fields:
+              - { label: "Nombre visible en la web", name: nombre, widget: string, default: "Lotes y colecciones" }
+              - { label: "Mostrar en la web", name: visible, widget: boolean, default: false }
+              - { label: "Orden", name: orden, widget: number, default: 4, value_type: int, min: 1 }
+
+  - name: cartas
+    label: "Productos del escaparate"
+    files:
+      - name: listado
+        label: "Listado de productos"
+        file: "content/cartas.json"
+        fields:
+          - label: "Productos"
+            name: cartas
+            widget: list
+            label_singular: "Producto"
+            summary: "[{{fields.apartado}}] {{fields.ref}} — {{fields.nombre}} ({{fields.disponibilidad}})"
+            fields:
+              - label: "Apartado"
+                name: apartado
+                widget: select
+                default: "sueltas"
+                hint: "Sección donde aparece. Debe estar encendida en «Apartados» para verse."
+                options:
+                  - { label: "Cartas gradeadas", value: "gradeadas" }
+                  - { label: "Producto sellado", value: "sellado" }
+                  - { label: "Cartas sueltas", value: "sueltas" }
+                  - { label: "Lotes y colecciones", value: "lotes" }
+              - { label: "Foto", name: foto, widget: image, required: false }
+              - { label: "Nombre", name: nombre, widget: string }
+              - { label: "Set / detalle", name: set, widget: string, required: false }
+              - { label: "Juego", name: juego, widget: select, required: false, options: ["Pokémon", "Magic", "Yu-Gi-Oh!", "One Piece", "Lorcana", "Deportivas", "Otro"] }
+              - { label: "Estado", name: estado_carta, widget: string, hint: "Near Mint, Light Play, PSA 10…" }
+              - { label: "Precio", name: precio, widget: string, hint: "Ej: 89 €" }
+              - { label: "Disponibilidad", name: disponibilidad, widget: select, options: ["Disponible", "Reservada", "Vendida"], default: "Disponible" }
+              - { label: "Referencia", name: ref, widget: string, hint: "Ej: MC-021" }
+
+  - name: sitio
+    label: "Textos de la web"
+    files:
+      - name: general
+        label: "Portada y contacto"
+        file: "content/sitio.json"
+        fields:
+          - { label: "Usuario de Instagram (visible)", name: handle, widget: string }
+          - { label: "Enlace a Instagram", name: instagram, widget: string }
+          - { label: "Enlace de WhatsApp (opcional)", name: whatsapp, widget: string, required: false }
+          - { label: "Banda superior", name: aviso, widget: string }
+          - { label: "Etiqueta pequeña", name: badge, widget: string }
+          - { label: "Titular", name: titulo, widget: string }
+          - { label: "Texto de entrada", name: intro, widget: text }
+          - { label: "Botón principal", name: boton1, widget: string }
+          - { label: "Botón secundario", name: boton2, widget: string }
+          - { label: "Pie del usuario de Instagram", name: dato1_pie, widget: string }
+          - { label: "Dato 2", name: dato2, widget: string }
+          - { label: "Pie dato 2", name: dato2_pie, widget: string }
+          - { label: "Dato 3", name: dato3, widget: string }
+          - { label: "Pie dato 3", name: dato3_pie, widget: string }
+          - { label: "Fecha de actualización", name: actualizado, widget: string }
+          - { label: "Carta destacada · título", name: destacada_titulo, widget: string }
+          - { label: "Carta destacada · etiqueta", name: destacada_etiqueta, widget: string }
+          - { label: "Carta destacada · set", name: destacada_set, widget: string }
+          - { label: "Carta destacada · precio", name: destacada_precio, widget: string }
+          - { label: "Carta destacada · foto", name: destacada_foto, widget: image, required: false }
+          - { label: "Compro colecciones · título", name: compro_titulo, widget: string }
+          - { label: "Compro colecciones · texto", name: compro_texto, widget: text }
+          - label: "Fotos del feed (cuadradas)"
+            name: feed
+            widget: list
+            required: false
+            field: { label: Foto, name: foto, widget: image }
