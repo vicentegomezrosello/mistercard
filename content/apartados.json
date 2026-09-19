@@ -6,7 +6,7 @@
   },
   "sellado": {
     "nombre": "Producto sellado",
-    "visible": true,
+    "visible": false,
     "orden": 2
   },
   "sueltas": {
