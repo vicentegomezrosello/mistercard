@@ -1,7 +1,7 @@
 {
   "cartas": [
     {
-      "apartado": "sueltas",
+      "apartado": "gradeadas",
       "foto": "",
       "nombre": "Pikachu Illustrator",
       "set": "Promo · BGS 9",
@@ -10,6 +10,28 @@
       "precio": "2.400 €",
       "disponibilidad": "Vendida",
       "ref": "MC-001"
+    },
+    {
+      "apartado": "sueltas",
+      "foto": "",
+      "nombre": "ff",
+      "set": "",
+      "juego": "",
+      "estado_carta": "hh",
+      "precio": "hh",
+      "disponibilidad": "Disponible",
+      "ref": "hh"
+    },
+    {
+      "apartado": "gradeadas",
+      "foto": "",
+      "nombre": "hh",
+      "set": "",
+      "juego": "",
+      "estado_carta": "ff",
+      "precio": "ff",
+      "disponibilidad": "Disponible",
+      "ref": "ff"
     }
   ]
 }
