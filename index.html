@@ -34,9 +34,10 @@
   .stage{display:flex;align-items:center;justify-content:center;min-height:500px;perspective:1600px}
   .glow{position:absolute;width:min(420px,84vw);height:min(420px,84vw);border-radius:50%;background:radial-gradient(circle,rgba(224,168,78,.3),transparent 66%);filter:blur(24px);animation:glowPulse 5s ease-in-out infinite}
   .card3d{width:290px;aspect-ratio:63/88;position:relative;transform-style:preserve-3d;animation:spinY 11s linear infinite}
-  /* Las dos caras se separan 0.6px en profundidad: si quedan en el mismo plano,
-     las GPU de móvil parten la carta por la mitad (z-fighting). */
-  .face{position:absolute;inset:0;-webkit-backface-visibility:hidden;backface-visibility:hidden;transform:translateZ(.6px);border-radius:18px;border:1px solid rgba(224,168,78,.45);box-shadow:0 40px 80px rgba(0,0,0,.6)}
+  /* Las dos caras se separan 4px en profundidad. Si quedan en el mismo plano,
+     las GPU de móvil parten la carta por la mitad o tapan una cara con la otra.
+     Menos de 1px no vale: el compositor del móvil lo redondea a cero. */
+  .face{position:absolute;inset:0;-webkit-backface-visibility:hidden;backface-visibility:hidden;transform:rotateY(0deg) translateZ(4px);border-radius:18px;border:1px solid rgba(224,168,78,.45);box-shadow:0 40px 80px rgba(0,0,0,.6)}
   .plinth{width:250px;height:54px;margin-top:-6px;border-radius:50%;background:radial-gradient(ellipse at 50% 35%,rgba(224,168,78,.4),rgba(224,168,78,.08) 55%,transparent 72%);border-top:1px solid rgba(224,168,78,.35);transform:rotateX(74deg);animation:glowPulse 5s ease-in-out infinite}
   /* Banda a todo el ancho, pero el contenido dentro de una columna centrada. */
   .strip{padding:18px 28px;background:#0c1830;border-top:1px solid rgba(244,236,224,.06);border-bottom:1px solid rgba(244,236,224,.06);font-size:13px;font-weight:600;color:#c6d0de}
@@ -172,7 +173,7 @@
               <span style="font-family:Sora,sans-serif;font-weight:700;font-size:15px;color:#e0a84e" id="dPrecio"></span>
             </div>
           </div>
-          <div class="face" style="transform:rotateY(180deg) translateZ(.6px);background:linear-gradient(160deg,#101d33,#0a1424);display:flex;align-items:center;justify-content:center;padding:26px">
+          <div class="face" style="transform:rotateY(180deg) translateZ(4px);background:linear-gradient(160deg,#101d33,#0a1424);display:flex;align-items:center;justify-content:center;padding:26px">
             <img src="assets/star.png" alt="mistercard" style="width:100%;height:auto">
           </div>
         </div>
