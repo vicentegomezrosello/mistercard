@@ -443,10 +443,20 @@ function pintaApartados() {
   document.documentElement.style.setProperty('--cols', (cols >= 1 && cols <= 6) ? cols : 4);
   montaDestacada(s);
   if (s.whatsapp) document.getElementById('wa').innerHTML = `También por <a href="${esc(s.whatsapp)}" target="_blank" rel="noopener">WhatsApp</a> si lo prefieres`;
-  const feed = (s.feed || []).map(f => typeof f === 'string' ? f : f.foto).filter(Boolean);
-  document.getElementById('feed').innerHTML = (feed.length ? feed : Array(9).fill('')).map(src =>
-    `<div class="ph" style="aspect-ratio:1;border-radius:10px;overflow:hidden;border:1px solid rgba(244,236,224,.1)">${src ? `<img src="${esc(src)}" alt="" loading="lazy">` : 'foto'}</div>`
-  ).join('');
+  // Rejilla de fotos del feed: si no hay fotos, no se pinta nada (antes salían
+  // nueve cuadrados grises de relleno).
+  const feed = (s.feed || []).map(f => typeof f === 'string' ? f : (f && (f.foto || f.img))).filter(Boolean);
+  const contFeed = document.getElementById('feed');
+  if (contFeed) {
+    if (!feed.length) {
+      contFeed.style.display = 'none';
+    } else {
+      contFeed.style.display = '';
+      contFeed.innerHTML = feed.map(src =>
+        `<div class="ph" style="aspect-ratio:1;border-radius:10px;overflow:hidden;border:1px solid rgba(244,236,224,.1)"><img src="${esc(src)}" alt="" loading="lazy"></div>`
+      ).join('');
+    }
+  }
   productos = c.cartas || [];
   apartados = a || {};
   pintaApartados();
