@@ -40,6 +40,10 @@
   .face{position:absolute;inset:0;-webkit-backface-visibility:hidden;backface-visibility:hidden;transform:rotateY(0deg) translateZ(4px);border-radius:18px;border:1px solid rgba(224,168,78,.45);box-shadow:0 40px 80px rgba(0,0,0,.6)}
   /* Modo "foto real": la carta que gira es la foto, sin marco ni textos. */
   .card3d.foto .face img{width:100%;height:100%;object-fit:cover;display:block}
+  /* Etiquetas de "qué compro". Vacío = no se pinta nada. */
+  .compro-chips{display:flex;flex-wrap:wrap;gap:9px;margin:0 0 26px;max-width:520px}
+  .compro-chips:empty{display:none}
+  .compro-chips span{background:rgba(224,168,78,.1);border:1px solid rgba(224,168,78,.3);color:#e8c07a;font-size:13px;font-weight:600;padding:7px 13px;border-radius:100px}
   .plinth{width:250px;height:54px;margin-top:-6px;border-radius:50%;background:radial-gradient(ellipse at 50% 35%,rgba(224,168,78,.4),rgba(224,168,78,.08) 55%,transparent 72%);border-top:1px solid rgba(224,168,78,.35);transform:rotateX(74deg);animation:glowPulse 5s ease-in-out infinite}
   /* Banda a todo el ancho, pero el contenido dentro de una columna centrada. */
   .strip{padding:18px 28px;background:#0c1830;border-top:1px solid rgba(244,236,224,.06);border-bottom:1px solid rgba(244,236,224,.06);font-size:13px;font-weight:600;color:#c6d0de}
@@ -219,7 +223,8 @@
 <section id="compro" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:40px;align-items:center">
   <div>
     <h2 style="font-weight:700;font-size:clamp(24px,3.4vw,32px);margin-bottom:14px" id="comproTitulo"></h2>
-    <p style="color:#9aa8bd;font-size:16px;line-height:1.6;max-width:520px;margin:0 0 26px;text-wrap:pretty" id="comproTexto"></p>
+    <p style="color:#9aa8bd;font-size:16px;line-height:1.6;max-width:520px;margin:0 0 16px;text-wrap:pretty" id="comproTexto"></p>
+    <div class="compro-chips" id="comproLista"></div>
     <a class="btn ig" href="#" target="_blank" rel="noopener">
       <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#0a1424" stroke-width="2" style="flex:none"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.2" cy="6.8" r="1.2" fill="#0a1424" stroke="none"></circle></svg>
       Mandar fotos del lote
@@ -415,6 +420,20 @@ function pintaApartados() {
   txt('dTitulo', s.destacada_titulo); txt('dEtiqueta', s.destacada_etiqueta);
   txt('dSet', s.destacada_set); txt('dPrecio', s.destacada_precio);
   txt('comproTitulo', s.compro_titulo); txt('comproTexto', s.compro_texto);
+  // Sección "Compro colecciones": se puede apagar entera desde el panel.
+  // Si el campo no existe todavía, se considera encendida.
+  const secCompro = document.getElementById('compro');
+  const navCompro = document.querySelector('nav a[href="#compro"]');
+  if (s.compro_visible === false) {
+    if (secCompro) secCompro.style.display = 'none';
+    if (navCompro) navCompro.style.display = 'none';
+  } else {
+    const queCompro = (s.compro_lista || [])
+      .map(x => typeof x === 'string' ? x : (x && (x.item || x.nombre)))
+      .filter(Boolean);
+    const contLista = document.getElementById('comproLista');
+    if (contLista) contLista.innerHTML = queCompro.map(x => `<span>${esc(x)}</span>`).join('');
+  }
   const nota = document.getElementById('notaEscaparate');
   if (nota && s.escaparate_nota) { nota.textContent = s.escaparate_nota; nota.style.display = ''; }
   if (s.como_titulo) txt('comoTitulo', s.como_titulo);
