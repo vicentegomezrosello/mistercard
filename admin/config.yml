@@ -113,6 +113,7 @@ collections:
           - { label: "Dato 3", name: dato3, widget: string }
           - { label: "Pie dato 3", name: dato3_pie, widget: string }
           - { label: "Fecha de actualización", name: actualizado, widget: string }
+          - { label: "Nota del escaparate (etiqueta dorada)", name: escaparate_nota, widget: string, required: false, hint: "Sale justo encima de los apartados. Déjalo vacío para que no aparezca." }
           - { label: "Carta destacada · título", name: destacada_titulo, widget: string }
           - { label: "Carta destacada · etiqueta", name: destacada_etiqueta, widget: string }
           - { label: "Carta destacada · set", name: destacada_set, widget: string }
