@@ -118,7 +118,8 @@ collections:
           - { label: "Carta destacada · etiqueta", name: destacada_etiqueta, widget: string }
           - { label: "Carta destacada · set", name: destacada_set, widget: string }
           - { label: "Carta destacada · precio", name: destacada_precio, widget: string }
-          - { label: "Carta destacada · foto", name: destacada_foto, widget: image, required: false }
+          - { label: "Carta que gira · foto (anverso)", name: destacada_foto, widget: image, required: false, hint: "Si pones foto, la carta que gira pasa a ser esta foto entera, sin marco ni textos. Si la dejas vacía, se ve el diseño con marco." }
+          - { label: "Carta que gira · foto del reverso", name: destacada_dorso, widget: image, required: false, hint: "Opcional. Si no pones nada, el reverso es la estrella de mistercard." }
           - label: "Cartas por fila (en ordenador)"
             name: columnas
             widget: select
@@ -141,8 +142,16 @@ collections:
             fields:
               - { label: "Título del paso", name: titulo, widget: string }
               - { label: "Explicación", name: texto, widget: text }
+          - { label: "Compro colecciones · MOSTRAR la sección", name: compro_visible, widget: boolean, default: true, hint: "Apágalo cuando no estés comprando. Desaparece la sección entera y su enlace del menú." }
           - { label: "Compro colecciones · título", name: compro_titulo, widget: string }
           - { label: "Compro colecciones · texto", name: compro_texto, widget: text }
+          - label: "Compro colecciones · qué compro"
+            name: compro_lista
+            widget: list
+            required: false
+            label_singular: "Producto"
+            hint: "Salen como etiquetas. Ej.: Pokémon vintage, Lotes sin abrir, Cartas gradeadas. Vacío = no se muestra nada."
+            field: { label: "Producto que compro", name: item, widget: string }
           - label: "Fotos del feed (cuadradas)"
             name: feed
             widget: list
