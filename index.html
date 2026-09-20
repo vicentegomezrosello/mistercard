@@ -38,6 +38,8 @@
      las GPU de móvil parten la carta por la mitad o tapan una cara con la otra.
      Menos de 1px no vale: el compositor del móvil lo redondea a cero. */
   .face{position:absolute;inset:0;-webkit-backface-visibility:hidden;backface-visibility:hidden;transform:rotateY(0deg) translateZ(4px);border-radius:18px;border:1px solid rgba(224,168,78,.45);box-shadow:0 40px 80px rgba(0,0,0,.6)}
+  /* Modo "foto real": la carta que gira es la foto, sin marco ni textos. */
+  .card3d.foto .face img{width:100%;height:100%;object-fit:cover;display:block}
   .plinth{width:250px;height:54px;margin-top:-6px;border-radius:50%;background:radial-gradient(ellipse at 50% 35%,rgba(224,168,78,.4),rgba(224,168,78,.08) 55%,transparent 72%);border-top:1px solid rgba(224,168,78,.35);transform:rotateX(74deg);animation:glowPulse 5s ease-in-out infinite}
   /* Banda a todo el ancho, pero el contenido dentro de una columna centrada. */
   .strip{padding:18px 28px;background:#0c1830;border-top:1px solid rgba(244,236,224,.06);border-bottom:1px solid rgba(244,236,224,.06);font-size:13px;font-weight:600;color:#c6d0de}
@@ -45,10 +47,12 @@
   .nota-wrap{text-align:center;padding:0 28px 26px}
   .nota-wrap .pill{margin-bottom:0}
   /* Nº de cartas por fila: se controla desde el panel (--cols). En móvil y tablet se ajusta solo. */
-  .grid{display:grid;grid-template-columns:repeat(var(--cols,4),minmax(0,1fr));gap:20px;max-width:1400px}
+  .grid{display:grid;grid-template-columns:repeat(var(--cols,4),minmax(0,1fr));gap:30px}
+  /* El escaparate entero (título, texto y productos) en una columna centrada. */
+  #escaparate .cabecera,#escaparate .bajada,#apartados{max-width:1240px;margin-left:auto;margin-right:auto}
   @media (max-width:900px){.grid{--cols:2}}
-  .foot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:auto;padding-top:12px}
-  .price{font-family:Sora,sans-serif;font-weight:700;font-size:19px}
+  .foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;margin-top:auto;padding-top:12px}
+  .price{font-family:Sora,sans-serif;font-weight:700;font-size:19px;white-space:nowrap}
   .datos{display:flex;flex-wrap:wrap;gap:30px}
   .dato{font-family:Sora,sans-serif;font-weight:700;font-size:24px}
   .dato-pie{font-size:12px;color:#5c6b82;font-weight:600}
@@ -62,7 +66,7 @@
   .paso .d{font-size:13px;color:#9aa8bd;line-height:1.55}
   .item{border:1px solid rgba(244,236,224,.09);border-radius:14px;background:#0f1d33;overflow:hidden;display:flex;flex-direction:column}
   .item:hover{border-color:rgba(224,168,78,.45)}
-  .apartado{margin-bottom:42px}
+  .apartado{margin-bottom:52px}
   .ap-tit{font-family:Sora,sans-serif;font-weight:700;font-size:19px;margin:0 0 16px;display:flex;align-items:center;gap:10px}
   .ap-num{font:700 12px Manrope,sans-serif;color:#e0a84e;background:rgba(224,168,78,.13);border:1px solid rgba(224,168,78,.34);padding:2px 9px;border-radius:100px}
   .ph{position:relative;aspect-ratio:63/88;background:repeating-linear-gradient(135deg,transparent,transparent 8px,rgba(244,236,224,.045) 8px,rgba(244,236,224,.045) 9px),linear-gradient(160deg,#1a2f4e,#101f36);display:flex;align-items:center;justify-content:center;font:11px ui-monospace,monospace;color:rgba(244,236,224,.3)}
@@ -193,11 +197,11 @@
 </div>
 
 <section id="escaparate" style="padding-bottom:20px">
-  <div style="display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:8px">
+  <div class="cabecera" style="display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:8px">
     <h2 style="font-weight:700;font-size:clamp(24px,3.4vw,32px)">En el escaparate</h2>
     <span style="font-size:13px;color:#9aa8bd;font-weight:600">Actualizado el <span id="actualizado"></span></span>
   </div>
-  <p style="color:#9aa8bd;font-size:15px;margin:0 0 20px;max-width:620px">Toca «Preguntar» y me llega tu mensaje en Instagram con la referencia del producto.</p>
+  <p class="bajada" style="color:#9aa8bd;font-size:15px;margin-top:0;margin-bottom:20px">Toca «Preguntar» y me llega tu mensaje en Instagram con la referencia del producto.</p>
   <div id="apartados"></div>
 </section>
 
@@ -312,6 +316,49 @@ function pintaPasos(lista) {
   </div>`).join('');
 }
 
+// Carta que gira en la portada.
+// Con foto: se ve la foto entera, sin marco ni textos, y la proporción se ajusta
+// sola a la de la imagen (una gradeada PSA no mide lo mismo que una carta suelta).
+// Sin foto: se queda el diseño con marco de siempre.
+function montaDestacada(s) {
+  const carta = document.querySelector('.card3d');
+  const caras = carta ? carta.querySelectorAll('.face') : [];
+  const hueco = document.getElementById('dFoto');
+  if (!carta || caras.length < 2) return;
+
+  if (!s.destacada_foto) {
+    if (hueco) hueco.textContent = 'foto de la carta';
+    return;
+  }
+
+  carta.classList.add('foto');
+  const limpia = cara => {
+    cara.style.background = 'none';
+    cara.style.padding = '0';
+    cara.style.border = 'none';
+    cara.style.overflow = 'hidden';
+  };
+
+  limpia(caras[0]);
+  caras[0].innerHTML = `<img src="${esc(s.destacada_foto)}" alt="Carta destacada">`;
+
+  if (s.destacada_dorso) {
+    limpia(caras[1]);
+    caras[1].innerHTML = `<img src="${esc(s.destacada_dorso)}" alt="">`;
+  } else {
+    caras[1].style.border = 'none';
+  }
+
+  // La proporción de la carta la manda la foto, así no se recorta ni deja huecos.
+  const img = new Image();
+  img.onload = () => {
+    if (img.naturalWidth && img.naturalHeight) {
+      carta.style.aspectRatio = img.naturalWidth + ' / ' + img.naturalHeight;
+    }
+  };
+  img.src = s.destacada_foto;
+}
+
 function pintaApartados() {
   const secs = APKEYS
     .map(k => Object.assign({ k, nombre: APNOM[k], visible: true, orden: 99 }, apartados[k] || {}))
@@ -370,8 +417,7 @@ function pintaApartados() {
   pintaPasos(s.pasos);
   const cols = parseInt(s.columnas, 10);
   document.documentElement.style.setProperty('--cols', (cols >= 1 && cols <= 6) ? cols : 4);
-  if (s.destacada_foto) document.getElementById('dFoto').innerHTML = `<img src="${esc(s.destacada_foto)}" alt="">`;
-  else document.getElementById('dFoto').textContent = 'foto de la carta';
+  montaDestacada(s);
   if (s.whatsapp) document.getElementById('wa').innerHTML = `También por <a href="${esc(s.whatsapp)}" target="_blank" rel="noopener">WhatsApp</a> si lo prefieres`;
   const feed = (s.feed || []).map(f => typeof f === 'string' ? f : f.foto).filter(Boolean);
   document.getElementById('feed').innerHTML = (feed.length ? feed : Array(9).fill('')).map(src =>
