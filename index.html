@@ -45,9 +45,11 @@
   .compro-chips:empty{display:none}
   .compro-chips span{background:rgba(224,168,78,.1);border:1px solid rgba(224,168,78,.3);color:#e8c07a;font-size:13px;font-weight:600;padding:7px 13px;border-radius:100px}
   /* Sin fotos del feed: el bloque se centra y el botón se pone al lado, a la derecha. */
-  #compro.sin-fotos{max-width:1080px;margin-left:auto;margin-right:auto;grid-template-columns:1fr auto;gap:48px}
+  #compro.sin-fotos{max-width:1080px;margin-left:auto;margin-right:auto;gap:40px}
   #compro.sin-fotos .compro-chips{margin-bottom:0}
-  @media (max-width:760px){#compro.sin-fotos{grid-template-columns:1fr;gap:24px}}
+  /* El botón no se estira: se queda del ancho de su texto, pegado al bloque. */
+  #compro.sin-fotos .btn{justify-self:start;align-self:center}
+  @media (max-width:760px){#compro.sin-fotos .btn{justify-self:stretch}}
   .plinth{width:250px;height:54px;margin-top:-6px;border-radius:50%;background:radial-gradient(ellipse at 50% 35%,rgba(224,168,78,.4),rgba(224,168,78,.08) 55%,transparent 72%);border-top:1px solid rgba(224,168,78,.35);transform:rotateX(74deg);animation:glowPulse 5s ease-in-out infinite}
   /* Banda a todo el ancho, pero el contenido dentro de una columna centrada. */
   .strip{padding:18px 28px;background:#0c1830;border-top:1px solid rgba(244,236,224,.06);border-bottom:1px solid rgba(244,236,224,.06);font-size:13px;font-weight:600;color:#c6d0de}
@@ -460,6 +462,11 @@ function pintaApartados() {
       if (secC && botonC) {
         secC.appendChild(botonC);
         secC.classList.add('sin-fotos');
+        // Las columnas van en el atributo style del propio <section>, así que hay
+        // que cambiarlas desde aquí: la hoja de estilos no puede ganarle.
+        if (window.matchMedia('(min-width:761px)').matches) {
+          secC.style.gridTemplateColumns = '1fr auto';
+        }
       }
     } else {
       contFeed.style.display = 'grid';   // 'grid', no '': vaciarlo borraría la rejilla
