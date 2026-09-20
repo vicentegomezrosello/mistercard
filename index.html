@@ -48,8 +48,13 @@
   .nota-wrap .pill{margin-bottom:0}
   /* Nº de cartas por fila: se controla desde el panel (--cols). En móvil y tablet se ajusta solo. */
   .grid{display:grid;grid-template-columns:repeat(var(--cols,4),minmax(0,1fr));gap:30px}
-  /* El escaparate entero (título, texto y productos) en una columna centrada. */
-  #escaparate .cabecera,#escaparate .bajada,#apartados{max-width:1240px;margin-left:auto;margin-right:auto}
+  /* El escaparate va en una columna centrada cuyo ancho crece con el número de
+     columnas, para que cada carta mantenga un tamaño decente. El 92vw evita que
+     llegue a tocar los bordes de la pantalla. */
+  #escaparate .cabecera,#escaparate .bajada,#apartados{
+    max-width:min(92vw, calc(var(--cols,4) * 250px + (var(--cols,4) - 1) * 30px));
+    margin-left:auto;margin-right:auto
+  }
   @media (max-width:900px){.grid{--cols:2}}
   .foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;margin-top:auto;padding-top:12px}
   .price{font-family:Sora,sans-serif;font-weight:700;font-size:19px;white-space:nowrap}
