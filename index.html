@@ -57,6 +57,10 @@
   /* Etiquetas de "qué compro". Vacío = no se pinta nada. */
   .compro-chips{display:flex;flex-wrap:wrap;gap:9px;margin:0 0 26px;max-width:520px}
   .compro-chips:empty{display:none}
+  /* Aviso de "referencia copiada" */
+  .aviso-copia{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(16px);background:#e0a84e;color:#0a1424;font-weight:700;font-size:14px;line-height:1.35;text-align:center;padding:13px 20px;border-radius:12px;box-shadow:0 14px 34px rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease;z-index:60;max-width:calc(100vw - 32px)}
+  .aviso-copia.ver{opacity:1;transform:translateX(-50%) translateY(0)}
+  @media (prefers-reduced-motion:reduce){.aviso-copia{transition:none}}
   .compro-chips span{background:rgba(224,168,78,.1);border:1px solid rgba(224,168,78,.3);color:#e8c07a;font-size:13px;font-weight:600;padding:7px 13px;border-radius:100px}
   /* Sin fotos del feed: el bloque se centra y el botón se pone al lado, a la derecha. */
   #compro.sin-fotos{max-width:1080px;margin-left:auto;margin-right:auto;gap:40px}
@@ -269,6 +273,8 @@
   <span style="font-size:12px;color:#8794ab">© <span id="anyo"></span> mistercard · <span class="handle"></span></span>
 </footer>
 
+<div class="aviso-copia" id="avisoCopia" role="status" aria-live="polite"></div>
+
 <script>
 const ST = {
   'Disponible': ['#7dd6a0', '#0a1424'],
@@ -319,7 +325,7 @@ function cardHTML(c, ratio) {
       ${estado}
       <div class="foot">
         <span class="price">${esc(c.precio)}</span>
-        <a class="ask ig" href="#" target="_blank" rel="noopener" aria-label="${c.ref ? `Consultar la referencia ${esc(c.ref)}, ${esc(c.nombre)}, por Instagram` : `Consultar ${esc(c.nombre)} por Instagram`}">
+        <a class="ask ig" href="#" target="_blank" rel="noopener" data-ref="${esc(c.ref || '')}" data-msg="${esc(`Hola! Me interesa ${c.nombre}${c.ref ? ` (${c.ref})` : ''}. ¿Sigue disponible?`)}" aria-label="${c.ref ? `Consultar la referencia ${esc(c.ref)}, ${esc(c.nombre)}, por Instagram` : `Consultar ${esc(c.nombre)} por Instagram`}">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex:none" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle></svg>
           ${c.ref ? `Consultar ${esc(c.ref)}` : 'Consultar'}
         </a>
@@ -344,6 +350,39 @@ function pintaPasos(lista) {
     <span class="n">${String(i + 1).padStart(2, '0')}</span>
     <div><div class="t">${esc(p.titulo)}</div><div class="d">${esc(p.texto)}</div></div>
   </div>`).join('');
+}
+
+// Copiar al portapapeles, con recambio para navegadores que no lo permitan.
+function copiaTexto(txt) {
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(txt).catch(() => copiaVieja(txt));
+      return;
+    }
+  } catch (e) { /* seguimos con el recambio */ }
+  copiaVieja(txt);
+}
+function copiaVieja(txt) {
+  try {
+    const t = document.createElement('textarea');
+    t.value = txt;
+    t.setAttribute('readonly', '');
+    t.style.cssText = 'position:fixed;top:-1000px;opacity:0';
+    document.body.appendChild(t);
+    t.select();
+    document.execCommand('copy');
+    document.body.removeChild(t);
+  } catch (e) { /* si no se puede copiar, el enlace sigue funcionando */ }
+}
+
+let relojAviso;
+function avisa(txt) {
+  const el = document.getElementById('avisoCopia');
+  if (!el) return;
+  el.textContent = txt;
+  el.classList.add('ver');
+  clearTimeout(relojAviso);
+  relojAviso = setTimeout(() => el.classList.remove('ver'), 4000);
 }
 
 // Carta que gira en la portada.
@@ -406,6 +445,17 @@ function pintaApartados() {
   const cont = document.getElementById('apartados');
   cont.innerHTML = html || '<p style="color:#9aa8bd">Ahora mismo no hay nada publicado. Vuelve pronto.</p>';
   cont.querySelectorAll('.ig').forEach(x => x.href = window.__ig || '#');
+  // Al consultar: copia el mensaje listo para pegar y avisa. No se bloquea la
+  // navegación: el enlace abre Instagram por su cuenta.
+  cont.querySelectorAll('.ask').forEach(a => {
+    a.addEventListener('click', () => {
+      const ref = a.dataset.ref || '';
+      const msg = a.dataset.msg || ref;
+      if (!msg) return;
+      copiaTexto(msg);
+      avisa(ref ? `Referencia ${ref} copiada. Pégala en el chat.` : 'Mensaje copiado. Pégalo en el chat.');
+    });
+  });
   // Tocar la foto pasa a la siguiente del producto.
   cont.querySelectorAll('.ph.multi').forEach(ph => {
     ph.addEventListener('click', () => {
@@ -428,7 +478,12 @@ function pintaApartados() {
     fetch('content/cartas.json').then(r => r.json()).catch(() => ({ cartas: [] })),
     fetch('content/apartados.json').then(r => r.json()).catch(() => ({}))
   ]);
-  window.__ig = s.instagram || '#';
+  // Enlace de contacto. En móvil abre el chat directo (ig.me); en ordenador va al
+  // perfil, porque Meta no soporta ig.me en Instagram Web.
+  const usuarioIG = (s.handle || '').replace(/^@/, '').trim();
+  const enMovil = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent || '');
+  window.__perfil = s.instagram || '#';
+  window.__ig = (enMovil && usuarioIG) ? 'https://ig.me/m/' + encodeURIComponent(usuarioIG) : window.__perfil;
   document.querySelectorAll('.ig').forEach(a => { a.href = window.__ig; });
   document.querySelectorAll('.handle').forEach(e => e.textContent = s.handle || '');
   txt('aviso', s.aviso); txt('badge', s.badge); txt('titulo', s.titulo); txt('intro', s.intro);
