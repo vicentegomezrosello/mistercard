@@ -7,12 +7,12 @@
   "sellado": {
     "nombre": "Producto sellado",
     "visible": true,
-    "orden": 2
+    "orden": 3
   },
   "sueltas": {
     "nombre": "Cartas sueltas",
     "visible": true,
-    "orden": 3
+    "orden": 2
   },
   "lotes": {
     "nombre": "Lotes y colecciones",
