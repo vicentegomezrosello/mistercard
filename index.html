@@ -5,9 +5,23 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>mistercard · Cartas TCG: Pokémon, Magic, One Piece</title>
 <meta name="description" content="Escaparate de cartas TCG coleccionables: Pokémon, Magic, Yu-Gi-Oh! y One Piece. Envíos desde Alicante con seguimiento. Reserva por Instagram.">
+<link rel="canonical" href="https://mistercard.es/">
+<!-- Vista previa al compartir el enlace (Instagram, WhatsApp, Telegram…).
+     Las rutas DEBEN ser absolutas: con rutas relativas no se ve ninguna imagen. -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="mistercard">
+<meta property="og:locale" content="es_ES">
+<meta property="og:url" content="https://mistercard.es/">
 <meta property="og:title" content="mistercard · Cartas TCG coleccionables">
 <meta property="og:description" content="Cartas y producto sellado con estado y precio. Envíos desde Alicante. Reserva por Instagram.">
-<meta property="og:image" content="assets/lockup.png">
+<meta property="og:image" content="https://mistercard.es/assets/og-mistercard.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="mistercard · escaparate de cartas TCG, envíos desde Alicante">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="mistercard · Cartas TCG coleccionables">
+<meta name="twitter:description" content="Cartas y producto sellado con estado y precio. Envíos desde Alicante. Reserva por Instagram.">
+<meta name="twitter:image" content="https://mistercard.es/assets/og-mistercard.png">
 <link rel="icon" href="assets/star.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -70,7 +84,7 @@
   .price{font-family:Sora,sans-serif;font-weight:700;font-size:19px;white-space:nowrap}
   .datos{display:flex;flex-wrap:wrap;gap:30px}
   .dato{font-family:Sora,sans-serif;font-weight:700;font-size:24px}
-  .dato-pie{font-size:12px;color:#5c6b82;font-weight:600}
+  .dato-pie{font-size:12px;color:#8794ab;font-weight:600}
   .pasos{display:grid;grid-template-columns:repeat(var(--n,3),minmax(0,1fr));gap:60px;max-width:1220px;margin:0 auto;text-align:left}
   #como{text-align:center}
   /* !important porque el número de pasos se fija por JS como estilo en línea. */
@@ -216,7 +230,7 @@
     <h2 style="font-weight:700;font-size:clamp(24px,3.4vw,32px)">En el escaparate</h2>
     <span style="font-size:13px;color:#9aa8bd;font-weight:600">Actualizado el <span id="actualizado"></span></span>
   </div>
-  <p class="bajada" style="color:#9aa8bd;font-size:15px;margin-top:0;margin-bottom:20px">Toca «Preguntar» y me llega tu mensaje en Instagram con la referencia del producto.</p>
+  <p class="bajada" style="color:#9aa8bd;font-size:15px;margin-top:0;margin-bottom:20px">Toca «Consultar» en la carta que te interese y me escribes por Instagram con su referencia.</p>
   <div id="apartados"></div>
 </section>
 
@@ -247,12 +261,12 @@
     <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#0a1424" stroke-width="2" style="flex:none"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.2" cy="6.8" r="1.2" fill="#0a1424" stroke="none"></circle></svg>
     <span class="handle"></span>
   </a>
-  <div style="font-size:13px;color:#5c6b82;margin-top:16px" id="wa"></div>
+  <div style="font-size:13px;color:#8794ab;margin-top:16px" id="wa"></div>
 </section>
 
 <footer>
   <img src="assets/lockup-tagline.png" alt="mistercard — built for collectors" style="height:50px;width:auto">
-  <span style="font-size:12px;color:#5c6b82">© <span id="anyo"></span> mistercard · <span class="handle"></span></span>
+  <span style="font-size:12px;color:#8794ab">© <span id="anyo"></span> mistercard · <span class="handle"></span></span>
 </footer>
 
 <script>
@@ -299,15 +313,15 @@ function cardHTML(c, ratio) {
     <div class="body">
       <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px">
         <div style="font-family:Sora,sans-serif;font-weight:600;font-size:15px;line-height:1.25">${esc(c.nombre)}</div>
-        <span style="font:11px ui-monospace,monospace;color:#5c6b82;flex:none">${esc(c.ref)}</span>
+        <span style="font:11px ui-monospace,monospace;color:#8794ab;flex:none">${esc(c.ref)}</span>
       </div>
-      <div style="font-size:12px;color:#5c6b82">${esc(c.set)}</div>
+      <div style="font-size:12px;color:#8794ab">${esc(c.set)}</div>
       ${estado}
       <div class="foot">
         <span class="price">${esc(c.precio)}</span>
-        <a class="ask ig" href="#" target="_blank" rel="noopener">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex:none"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle></svg>
-          Preguntar
+        <a class="ask ig" href="#" target="_blank" rel="noopener" aria-label="${c.ref ? `Consultar la referencia ${esc(c.ref)}, ${esc(c.nombre)}, por Instagram` : `Consultar ${esc(c.nombre)} por Instagram`}">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex:none" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle></svg>
+          ${c.ref ? `Consultar ${esc(c.ref)}` : 'Consultar'}
         </a>
       </div>
     </div>
