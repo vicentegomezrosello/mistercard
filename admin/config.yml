@@ -85,7 +85,7 @@ collections:
                 field: { label: Foto, name: img, widget: image }
               - { label: "Nombre", name: nombre, widget: string }
               - { label: "Set / detalle", name: set, widget: string, required: false }
-              - { label: "Juego", name: juego, widget: select, required: false, options: ["Pokémon", "Magic", "Yu-Gi-Oh!", "One Piece", "Lorcana", "Deportivas", "Otro"] }
+              - { label: "Juego", name: juego, widget: select, required: false, options: ["Pokémon", "Riftbound", "One Piece", "Lorcana", "Deportivas", "Otro"] }
               - { label: "Estado", name: estado_carta, widget: string, hint: "Near Mint, Light Play, PSA 10…" }
               - { label: "Precio", name: precio, widget: string, hint: "Ej: 89 €" }
               - { label: "Disponibilidad", name: disponibilidad, widget: select, options: ["Disponible", "Reservada", "Vendida"], default: "Disponible" }
