@@ -16,9 +16,12 @@
       "ref": "MC-001"
     },
     {
-      "apartado": "lotes",
-      "foto": "",
-      "fotos": [],
+      "apartado": "gradeadas",
+      "foto": "/images/1000226599.webp",
+      "fotos": [
+        "/images/1000226592.webp",
+        "/images/1000226591.webp"
+      ],
       "nombre": "251515",
       "set": "Promo · BGS 9",
       "juego": "Pokémon",
@@ -28,9 +31,12 @@
       "ref": "5858"
     },
     {
-      "apartado": "sellado",
-      "foto": "",
-      "fotos": [],
+      "apartado": "gradeadas",
+      "foto": "/images/1000226600.webp",
+      "fotos": [
+        "/images/1000226593.webp",
+        "/images/1000226594.webp"
+      ],
       "nombre": "hh",
       "set": "Promo · BGS 9",
       "juego": "Magic",
@@ -41,20 +47,11 @@
     },
     {
       "apartado": "gradeadas",
-      "foto": "",
-      "fotos": [],
-      "nombre": "ff",
-      "set": "",
-      "juego": "",
-      "estado_carta": "ff",
-      "precio": "ff",
-      "disponibilidad": "Disponible",
-      "ref": "ff"
-    },
-    {
-      "apartado": "sueltas",
-      "foto": "",
-      "fotos": [],
+      "foto": "/images/1000226595.webp",
+      "fotos": [
+        "/images/1000226587.webp",
+        "/images/1000226588.webp"
+      ],
       "nombre": "ff",
       "set": "",
       "juego": "",
@@ -65,8 +62,26 @@
     },
     {
       "apartado": "gradeadas",
-      "foto": "",
-      "fotos": [],
+      "foto": "/images/1000226597.webp",
+      "fotos": [
+        "/images/1000226589.webp",
+        "/images/1000226590.webp"
+      ],
+      "nombre": "ff",
+      "set": "",
+      "juego": "",
+      "estado_carta": "ff",
+      "precio": "ff",
+      "disponibilidad": "Disponible",
+      "ref": "ff"
+    },
+    {
+      "apartado": "gradeadas",
+      "foto": "/images/1000226598.webp",
+      "fotos": [
+        "/images/1000226585.webp",
+        "/images/1000226586.webp"
+      ],
       "nombre": "ff",
       "set": "",
       "juego": "",
