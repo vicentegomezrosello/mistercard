@@ -19,7 +19,8 @@
   "destacada_etiqueta": "PSA 10",
   "destacada_set": "Evolving Skies",
   "destacada_precio": "310 €",
-  "destacada_foto": "",
+  "destacada_foto": "/images/1000226596.webp",
+  "destacada_dorso": "",
   "columnas": "5",
   "como_titulo": "Cómo comprar",
   "como_texto": "Tres pasos, todo por mensaje directo.",
@@ -37,7 +38,9 @@
       "texto": "Bizum o transferencia. Envío protegido con seguimiento en 24-48 h."
     }
   ],
+  "compro_visible": true,
   "compro_titulo": "También compro colecciones",
   "compro_texto": "Mándame fotos del lote por Instagram y te digo qué me interesa y a qué precio. Sin compromiso y sin tasaciones eternas.",
+  "compro_lista": [],
   "feed": []
 }
