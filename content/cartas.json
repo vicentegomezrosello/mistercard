@@ -7,13 +7,13 @@
         "/images/1000226584.webp",
         "/images/1000226583.webp"
       ],
-      "nombre": "Pikachu Illustrator",
-      "set": "Promo · BGS 9",
+      "nombre": "Blastoise CD Promo Holo",
+      "set": "Pokémon (1998) Japanese",
       "juego": "Pokémon",
-      "estado_carta": "BGS 9",
-      "precio": "2.400 €",
-      "disponibilidad": "Vendida",
-      "ref": "MC-001"
+      "estado_carta": "CGC 9",
+      "precio": "620",
+      "disponibilidad": "Disponible",
+      "ref": "CD - BLASTOISE"
     },
     {
       "apartado": "gradeadas",
@@ -22,13 +22,13 @@
         "/images/1000226592.webp",
         "/images/1000226591.webp"
       ],
-      "nombre": "251515",
-      "set": "Promo · BGS 9",
+      "nombre": "Charizard VMAX - SHINING FATES",
+      "set": "Shining Fates",
       "juego": "Pokémon",
-      "estado_carta": "622",
-      "precio": "300",
+      "estado_carta": "BGS 9.5",
+      "precio": "200",
       "disponibilidad": "Disponible",
-      "ref": "5858"
+      "ref": "SV107- CHARIZARD"
     },
     {
       "apartado": "gradeadas",
@@ -37,13 +37,13 @@
         "/images/1000226593.webp",
         "/images/1000226594.webp"
       ],
-      "nombre": "hh",
-      "set": "Promo · BGS 9",
-      "juego": "Magic",
-      "estado_carta": "ff",
-      "precio": "ff",
+      "nombre": "MACHAMP V - ASTRAL RADIANCE",
+      "set": "Astral Radiance",
+      "juego": "Pokémon",
+      "estado_carta": "PSA 9",
+      "precio": "170",
       "disponibilidad": "Disponible",
-      "ref": "ff"
+      "ref": "MACHAMP - 172"
     },
     {
       "apartado": "gradeadas",
@@ -52,13 +52,13 @@
         "/images/1000226587.webp",
         "/images/1000226588.webp"
       ],
-      "nombre": "ff",
-      "set": "",
-      "juego": "",
-      "estado_carta": "ff",
-      "precio": "ff",
+      "nombre": "MOTRES & ZAPDOS & ARTICUNO PROMO",
+      "set": "Black Star",
+      "juego": "Pokémon",
+      "estado_carta": "BGS 9",
+      "precio": "140",
       "disponibilidad": "Disponible",
-      "ref": "ff"
+      "ref": "MZA- 210"
     },
     {
       "apartado": "gradeadas",
@@ -67,13 +67,13 @@
         "/images/1000226589.webp",
         "/images/1000226590.webp"
       ],
-      "nombre": "ff",
-      "set": "",
-      "juego": "",
-      "estado_carta": "ff",
-      "precio": "ff",
+      "nombre": "TERAPAGOS ex - CORONA ASTRAL",
+      "set": "Corona Astral",
+      "juego": "Pokémon",
+      "estado_carta": "PSA 10",
+      "precio": "200",
       "disponibilidad": "Disponible",
-      "ref": "ff"
+      "ref": "TERAPAGOS - 170"
     },
     {
       "apartado": "gradeadas",
@@ -82,13 +82,13 @@
         "/images/1000226585.webp",
         "/images/1000226586.webp"
       ],
-      "nombre": "ff",
-      "set": "",
-      "juego": "",
-      "estado_carta": "ff",
-      "precio": "ff",
+      "nombre": "ANTHONY EDWARDS - MOSAIC",
+      "set": "REACTIVE ORANGE",
+      "juego": "Pokémon",
+      "estado_carta": "PSA 10",
+      "precio": "200",
       "disponibilidad": "Disponible",
-      "ref": "ff"
+      "ref": "AED - RC"
     }
   ]
 }
