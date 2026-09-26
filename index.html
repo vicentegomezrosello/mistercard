@@ -117,6 +117,32 @@
   .ask:hover{background:#e0a84e;color:#0a1424}
   .tab{padding:9px 16px;border-radius:100px;font-size:13px;font-weight:700;cursor:pointer;background:#0f1d33;color:#c6d0de;border:1px solid rgba(244,236,224,.12)}
   .tab[aria-pressed=true]{background:#e0a84e;color:#0a1424;border-color:#e0a84e}
+  /* La foto abre la ficha ampliada. */
+  .item .ph{cursor:zoom-in}
+  .multi-badge{position:absolute;bottom:9px;right:9px;z-index:2;background:rgba(10,20,36,.72);border:1px solid rgba(244,236,224,.16);color:#e8eefc;font-size:11px;font-weight:700;padding:4px 9px;border-radius:100px}
+  /* Botón de producto vendido: apagado, no se puede pulsar. */
+  .ask.vendida{background:rgba(244,236,224,.05);border-color:rgba(244,236,224,.12);color:#8794ab;cursor:default}
+  .ask.vendida:hover{background:rgba(244,236,224,.05);color:#8794ab}
+  /* Ficha ampliada (lightbox) */
+  .lb{position:fixed;inset:0;z-index:80;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(5,10,20,.82);backdrop-filter:blur(6px)}
+  .lb.ver{display:flex}
+  .lb-card{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,300px);max-width:880px;width:100%;max-height:90vh;background:#0f1d33;border:1px solid rgba(224,168,78,.3);border-radius:18px;overflow:hidden}
+  .lb-foto{position:relative;background:#0a1424;display:flex;align-items:center;justify-content:center;min-height:0}
+  .lb-foto img{max-width:100%;max-height:90vh;width:auto;height:auto;object-fit:contain}
+  .lb-nav{position:absolute;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:50%;background:rgba(10,20,36,.72);border:1px solid rgba(244,236,224,.18);color:#f4ece0;font:400 22px/1 Sora,sans-serif;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0 0 3px}
+  .lb-nav.prev{left:12px}.lb-nav.next{right:12px}
+  .lb-dots{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:6px}
+  .lb-dots i{width:7px;height:7px;border-radius:50%;background:rgba(244,236,224,.4)}
+  .lb-dots i.on{background:#e0a84e}
+  .lb-info{padding:26px 24px;display:flex;flex-direction:column;gap:11px;overflow-y:auto}
+  .lb-cerrar{position:absolute;top:12px;right:12px;z-index:4;width:36px;height:36px;border-radius:50%;background:rgba(10,20,36,.72);border:1px solid rgba(244,236,224,.18);color:#f4ece0;font:400 17px/1 Sora,sans-serif;display:flex;align-items:center;justify-content:center;cursor:pointer}
+  @media (max-width:720px){
+    .lb{padding:0}
+    .lb-card{grid-template-columns:1fr;grid-template-rows:auto 1fr;max-height:100vh;height:100%;border-radius:0;border:none}
+    .lb-foto{max-height:58vh}
+    .lb-foto img{max-height:58vh}
+    .lb-info{padding:18px 16px 28px}
+  }
   section{padding:56px 28px}
   footer{padding:34px 28px;background:#0c1830;border-top:1px solid rgba(244,236,224,.07);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center}
   @media (prefers-reduced-motion:reduce){.card3d,.glow,.plinth{animation:none!important}}
@@ -274,6 +300,14 @@
   <span style="font-size:12px;color:#8794ab">© <span id="anyo"></span> mistercard · <span class="handle"></span></span>
 </footer>
 
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Ficha del producto">
+  <div class="lb-card">
+    <button class="lb-cerrar" id="lbCerrar" aria-label="Cerrar">&#10005;</button>
+    <div class="lb-foto" id="lbFoto"></div>
+    <div class="lb-info" id="lbInfo"></div>
+  </div>
+</div>
+
 <div class="aviso-copia" id="avisoCopia" role="status" aria-live="polite"></div>
 
 <script>
@@ -302,20 +336,48 @@ function fotosDe(c) {
   return [c.foto, ...extra].filter(Boolean);
 }
 
+// El botón cambia según disponibilidad:
+//  Disponible -> "Consultar REF" (mensaje: ¿sigue disponible?)
+//  Reservada  -> "Avisarme si se libera" (mensaje distinto)
+//  Vendida    -> botón apagado, no se puede pulsar
+function accionDe(c) {
+  const disp = c.disponibilidad || 'Disponible';
+  const ref = c.ref || '', nom = c.nombre || '';
+  const avisoRef = ref ? `Referencia ${ref} copiada. Pégala en el chat.` : 'Mensaje copiado. Pégalo en el chat.';
+  if (disp === 'Vendida') return { vendida: true, label: 'Vendida' };
+  if (disp === 'Reservada') return {
+    label: 'Avisarme si se libera',
+    msg: `Hola! Vi que ${nom}${ref ? ` (${ref})` : ''} está reservada. ¿Me avisas si se libera?`,
+    aviso: avisoRef
+  };
+  return {
+    label: ref ? `Consultar ${ref}` : 'Consultar',
+    msg: `Hola! Me interesa ${nom}${ref ? ` (${ref})` : ''}. ¿Sigue disponible?`,
+    aviso: avisoRef
+  };
+}
+
+function botonHTML(c) {
+  const a = accionDe(c);
+  if (a.vendida) return `<span class="ask vendida" aria-disabled="true">${esc(a.label)}</span>`;
+  return `<a class="ask ig" href="#" target="_blank" rel="noopener" data-msg="${esc(a.msg)}" data-aviso="${esc(a.aviso)}" aria-label="${esc(a.label)} por Instagram">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex:none" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle></svg>
+    ${esc(a.label)}
+  </a>`;
+}
+
 function cardHTML(c, ratio) {
   const [bg, fg] = ST[c.disponibilidad] || ST.Disponible;
   const imgs = fotosDe(c);
   const foto = imgs.length ? `<img src="${esc(imgs[0])}" alt="${esc(c.nombre)}" loading="lazy">` : 'foto del producto';
-  const puntos = imgs.length > 1
-    ? `<span class="puntos">${imgs.map((_, i) => `<i${i === 0 ? ' class="on"' : ''}></i>`).join('')}</span>`
-    : '';
+  const badge = imgs.length > 1 ? `<span class="multi-badge">${imgs.length} fotos</span>` : '';
   const juego = c.juego ? `<span class="tag">${esc(c.juego)}</span>` : '';
   const estado = c.estado_carta ? `<div style="display:flex;align-items:center;gap:7px;margin-top:2px"><span style="width:7px;height:7px;border-radius:50%;background:${COND(c.estado_carta)}"></span><span style="font-size:12px;font-weight:600;color:#9aa8bd">${esc(c.estado_carta)}</span></div>` : '';
-  return `<article class="item">
-    <div class="ph${imgs.length > 1 ? ' multi' : ''}" style="aspect-ratio:${ratio}" data-fotos="${esc(JSON.stringify(imgs))}" data-i="0">${foto}
+  return `<article class="item" data-idx="${c.__i}">
+    <div class="ph" style="aspect-ratio:${ratio}" role="button" tabindex="0" aria-label="Ampliar ${esc(c.nombre)}">${foto}
       ${juego}
       <span class="st" style="background:${bg};color:${fg}">${esc(c.disponibilidad)}</span>
-      ${puntos}
+      ${badge}
     </div>
     <div class="body">
       <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px">
@@ -326,10 +388,7 @@ function cardHTML(c, ratio) {
       ${estado}
       <div class="foot">
         <span class="price">${esc(c.precio)}</span>
-        <a class="ask ig" href="#" target="_blank" rel="noopener" data-ref="${esc(c.ref || '')}" data-msg="${esc(`Hola! Me interesa ${c.nombre}${c.ref ? ` (${c.ref})` : ''}. ¿Sigue disponible?`)}" aria-label="${c.ref ? `Consultar la referencia ${esc(c.ref)}, ${esc(c.nombre)}, por Instagram` : `Consultar ${esc(c.nombre)} por Instagram`}">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex:none" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle></svg>
-          ${c.ref ? `Consultar ${esc(c.ref)}` : 'Consultar'}
-        </a>
+        ${botonHTML(c)}
       </div>
     </div>
   </article>`;
@@ -446,31 +505,101 @@ function pintaApartados() {
   const cont = document.getElementById('apartados');
   cont.innerHTML = html || '<p style="color:#9aa8bd">Ahora mismo no hay nada publicado. Vuelve pronto.</p>';
   cont.querySelectorAll('.ig').forEach(x => x.href = window.__ig || '#');
-  // Al consultar: copia el mensaje listo para pegar y avisa. No se bloquea la
-  // navegación: el enlace abre Instagram por su cuenta.
-  cont.querySelectorAll('.ask').forEach(a => {
+  // Al pulsar el botón: copia el mensaje listo para pegar y avisa. No se bloquea la
+  // navegación: el enlace abre Instagram por su cuenta. (Los vendidos no llevan .ig.)
+  cont.querySelectorAll('.ask.ig').forEach(a => {
     a.addEventListener('click', () => {
-      const ref = a.dataset.ref || '';
-      const msg = a.dataset.msg || ref;
+      const msg = a.dataset.msg || '';
       if (!msg) return;
       copiaTexto(msg);
-      avisa(ref ? `Referencia ${ref} copiada. Pégala en el chat.` : 'Mensaje copiado. Pégalo en el chat.');
+      avisa(a.dataset.aviso || 'Mensaje copiado. Pégalo en el chat.');
     });
   });
-  // Tocar la foto pasa a la siguiente del producto.
-  cont.querySelectorAll('.ph.multi').forEach(ph => {
-    ph.addEventListener('click', () => {
-      let lista = [];
-      try { lista = JSON.parse(ph.dataset.fotos || '[]'); } catch (e) { return; }
-      if (lista.length < 2) return;
-      const n = (parseInt(ph.dataset.i, 10) + 1) % lista.length;
-      ph.dataset.i = n;
-      const img = ph.querySelector('img');
-      if (img) img.src = lista[n];
-      ph.querySelectorAll('.puntos i').forEach((p, i) => p.classList.toggle('on', i === n));
+  // Tocar la carta abre la ficha ampliada.
+  cont.querySelectorAll('.item').forEach(it => {
+    const idx = parseInt(it.dataset.idx, 10);
+    const ph = it.querySelector('.ph');
+    if (!ph || isNaN(idx)) return;
+    ph.addEventListener('click', () => abreLB(idx));
+    ph.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); abreLB(idx); }
     });
   });
 }
+
+// ---- Ficha ampliada (lightbox) ----
+let lbFotos = [], lbIdx = 0, lbAntesFoco = null;
+
+function abreLB(idx) {
+  const c = productos[idx];
+  if (!c) return;
+  lbFotos = fotosDe(c);
+  lbIdx = 0;
+  const [bg, fg] = ST[c.disponibilidad] || ST.Disponible;
+  const estado = c.estado_carta ? `<div style="display:flex;align-items:center;gap:8px"><span style="width:8px;height:8px;border-radius:50%;background:${COND(c.estado_carta)}"></span><span style="font-size:13px;color:#c6d0de">${esc(c.estado_carta)}</span></div>` : '';
+  const info = document.getElementById('lbInfo');
+  info.innerHTML = `
+    <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap">
+      ${c.juego ? `<span class="tag" style="position:static">${esc(c.juego)}</span>` : ''}
+      <span class="st" style="position:static;background:${bg};color:${fg}">${esc(c.disponibilidad || 'Disponible')}</span>
+    </div>
+    <h3 style="font-family:Sora,sans-serif;font-weight:700;font-size:22px;margin:2px 0 0;line-height:1.2">${esc(c.nombre)}</h3>
+    ${c.set ? `<div style="font-size:13px;color:#8794ab">${esc(c.set)}</div>` : ''}
+    ${estado}
+    <div class="price" style="font-size:26px;margin-top:4px">${esc(c.precio)}</div>
+    <div style="font:12px ui-monospace,monospace;color:#8794ab">Ref. ${esc(c.ref || '—')}</div>
+    <div style="margin-top:auto;padding-top:14px">${botonHTML(c)}</div>
+  `;
+  info.querySelectorAll('.ig').forEach(x => x.href = window.__ig || '#');
+  info.querySelectorAll('.ask.ig').forEach(a => {
+    a.addEventListener('click', () => {
+      copiaTexto(a.dataset.msg || '');
+      avisa(a.dataset.aviso || 'Mensaje copiado. Pégalo en el chat.');
+    });
+  });
+  pintaLBFoto();
+  const lb = document.getElementById('lb');
+  lbAntesFoco = document.activeElement;
+  lb.classList.add('ver');
+  document.body.style.overflow = 'hidden';
+  document.getElementById('lbCerrar').focus();
+}
+
+function pintaLBFoto() {
+  const cont = document.getElementById('lbFoto');
+  const src = lbFotos[lbIdx];
+  const varias = lbFotos.length > 1;
+  cont.innerHTML = `
+    ${src ? `<img src="${esc(src)}" alt="">` : '<div style="color:#9aa8bd;padding:48px 20px">Sin foto todavía</div>'}
+    ${varias ? '<button class="lb-nav prev" aria-label="Anterior">&#8249;</button><button class="lb-nav next" aria-label="Siguiente">&#8250;</button>' : ''}
+    ${varias ? `<div class="lb-dots">${lbFotos.map((_, i) => `<i${i === lbIdx ? ' class="on"' : ''}></i>`).join('')}</div>` : ''}
+  `;
+  if (varias) {
+    cont.querySelector('.prev').addEventListener('click', e => { e.stopPropagation(); lbMueve(-1); });
+    cont.querySelector('.next').addEventListener('click', e => { e.stopPropagation(); lbMueve(1); });
+  }
+}
+
+function lbMueve(d) {
+  if (lbFotos.length < 2) return;
+  lbIdx = (lbIdx + d + lbFotos.length) % lbFotos.length;
+  pintaLBFoto();
+}
+
+function cierraLB() {
+  document.getElementById('lb').classList.remove('ver');
+  document.body.style.overflow = '';
+  if (lbAntesFoco && lbAntesFoco.focus) lbAntesFoco.focus();
+}
+
+document.getElementById('lbCerrar').addEventListener('click', cierraLB);
+document.getElementById('lb').addEventListener('click', e => { if (e.target.id === 'lb') cierraLB(); });
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('lb').classList.contains('ver')) return;
+  if (e.key === 'Escape') cierraLB();
+  else if (e.key === 'ArrowLeft') lbMueve(-1);
+  else if (e.key === 'ArrowRight') lbMueve(1);
+});
 
 (async () => {
   document.getElementById('anyo').textContent = new Date().getFullYear();
@@ -545,7 +674,7 @@ function pintaApartados() {
       ).join('');
     }
   }
-  productos = c.cartas || [];
+  productos = (c.cartas || []).map((p, i) => { p.__i = i; return p; });
   apartados = a || {};
   pintaApartados();
 })();
