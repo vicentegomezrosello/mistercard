@@ -548,7 +548,12 @@ function abreLB(idx) {
     ${estado}
     <div class="price" style="font-size:26px;margin-top:4px">${esc(c.precio)}</div>
     <div style="font:12px ui-monospace,monospace;color:#8794ab">Ref. ${esc(c.ref || '—')}</div>
-    <div style="margin-top:auto;padding-top:14px">${botonHTML(c)}</div>
+    ${c.cert ? `<div style="font:12px ui-monospace,monospace;color:#8794ab">Cert. ${esc(c.cert)}</div>` : ''}
+    <div style="margin-top:14px;border-top:1px solid rgba(244,236,224,.09);padding-top:14px;display:flex;flex-direction:column;gap:9px;font-size:13px;color:#c6d0de">
+      <div style="display:flex;gap:9px;align-items:center"><span style="color:#e0a84e">◆</span> Envío en 24-48 h con seguimiento</div>
+      <div style="display:flex;gap:9px;align-items:center"><span style="color:#e0a84e">◆</span> Desde Alicante · Bizum o transferencia</div>
+    </div>
+    <div style="margin-top:auto;padding-top:16px">${botonHTML(c)}</div>
   `;
   info.querySelectorAll('.ig').forEach(x => x.href = window.__ig || '#');
   info.querySelectorAll('.ask.ig').forEach(a => {
