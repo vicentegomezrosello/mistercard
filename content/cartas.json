@@ -2,8 +2,11 @@
   "cartas": [
     {
       "apartado": "gradeadas",
-      "foto": "",
-      "fotos": [],
+      "foto": "/images/1000226596.webp",
+      "fotos": [
+        "/images/1000226584.webp",
+        "/images/1000226583.webp"
+      ],
       "nombre": "Pikachu Illustrator",
       "set": "Promo · BGS 9",
       "juego": "Pokémon",
