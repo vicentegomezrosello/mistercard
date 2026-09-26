@@ -85,8 +85,10 @@
     margin-left:auto;margin-right:auto
   }
   @media (max-width:900px){.grid{--cols:2}}
-  .foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;margin-top:auto;padding-top:12px}
-  .price{font-family:Sora,sans-serif;font-weight:700;font-size:19px;white-space:nowrap}
+  /* Precio y botón siempre apilados, en el mismo sitio en todas las tarjetas. */
+  .foot{display:flex;flex-direction:column;align-items:stretch;gap:10px;margin-top:auto;padding-top:14px}
+  .foot .ask{justify-content:center;white-space:nowrap}
+  .price{font-family:Sora,sans-serif;font-weight:800;font-size:22px;color:#e0a84e;white-space:nowrap}
   .datos{display:flex;flex-wrap:wrap;gap:30px}
   .dato{font-family:Sora,sans-serif;font-weight:700;font-size:24px}
   .dato-pie{font-size:12px;color:#8794ab;font-weight:600}
@@ -344,25 +346,30 @@ function accionDe(c) {
   const disp = c.disponibilidad || 'Disponible';
   const ref = c.ref || '', nom = c.nombre || '';
   const avisoRef = ref ? `Referencia ${ref} copiada. Pégala en el chat.` : 'Mensaje copiado. Pégalo en el chat.';
-  if (disp === 'Vendida') return { vendida: true, label: 'Vendida' };
+  if (disp === 'Vendida') return { vendida: true, label: 'Vendida', labelCorto: 'Vendida' };
   if (disp === 'Reservada') return {
     label: 'Avisarme si se libera',
+    labelCorto: 'Avisar si sale',
     msg: `Hola! Vi que ${nom}${ref ? ` (${ref})` : ''} está reservada. ¿Me avisas si se libera?`,
     aviso: avisoRef
   };
   return {
-    label: ref ? `Consultar ${ref}` : 'Consultar',
+    label: 'Consultar',
+    labelCorto: 'Consultar',
     msg: `Hola! Me interesa ${nom}${ref ? ` (${ref})` : ''}. ¿Sigue disponible?`,
     aviso: avisoRef
   };
 }
 
-function botonHTML(c) {
+// corto = etiqueta de una sola línea para la tarjeta (evita que el botón se
+// parta en dos y descuadre el precio). La ficha ampliada usa la etiqueta larga.
+function botonHTML(c, corto) {
   const a = accionDe(c);
-  if (a.vendida) return `<span class="ask vendida" aria-disabled="true">${esc(a.label)}</span>`;
+  const label = (corto && a.labelCorto) ? a.labelCorto : a.label;
+  if (a.vendida) return `<span class="ask vendida" aria-disabled="true">${esc(label)}</span>`;
   return `<a class="ask ig" href="#" target="_blank" rel="noopener" data-msg="${esc(a.msg)}" data-aviso="${esc(a.aviso)}" aria-label="${esc(a.label)} por Instagram">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex:none" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle></svg>
-    ${esc(a.label)}
+    ${esc(label)}
   </a>`;
 }
 
@@ -388,7 +395,7 @@ function cardHTML(c, ratio) {
       ${estado}
       <div class="foot">
         <span class="price">${esc(c.precio)}</span>
-        ${botonHTML(c)}
+        ${botonHTML(c, true)}
       </div>
     </div>
   </article>`;
