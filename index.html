@@ -326,6 +326,20 @@ const esc = s => String(s ?? '').replace(/[&<>"]/g, m => ({ '&': '&amp;', '<': '
 const txt = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v || ''; };
 const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
 const fechaES = d => d.getDate() + ' de ' + MESES[d.getMonth()];
+// Fecha del último cambio publicado, leída del último commit de GitHub (la
+// fuente real de la web). Es lo que hace que "Actualizado el…" se ponga solo.
+async function fechaUltimoCambio() {
+  try {
+    const r = await fetch('https://api.github.com/repos/vicentegomezrosello/mistercard/commits?per_page=1', { cache: 'no-store' });
+    if (!r.ok) return null;
+    const j = await r.json();
+    const commit = j && j[0] && j[0].commit;
+    const iso = commit && ((commit.committer && commit.committer.date) || (commit.author && commit.author.date));
+    if (!iso) return null;
+    const d = new Date(iso);
+    return isNaN(d.getTime()) ? null : d;
+  } catch (e) { return null; }
+}
 
 let productos = [], apartados = {};
 const APKEYS = ['gradeadas', 'sellado', 'sueltas', 'lotes'];
@@ -643,14 +657,16 @@ document.addEventListener('keydown', e => {
   if (s.boton2) txt('boton2', s.boton2);
   if (s.dato1_pie) txt('dato1p', s.dato1_pie);
   txt('dato2', s.dato2); txt('dato2p', s.dato2_pie); txt('dato3', s.dato3); txt('dato3p', s.dato3_pie);
-  // Fecha automática: la del último cambio publicado. Si el servidor no da esa
-  // cabecera, cae al valor manual del panel (por si acaso).
+  // Fecha "Actualizado el…": primero un valor inmediato (cabecera del servidor o
+  // el campo manual) para que no salga vacío, y enseguida se afina con la fecha
+  // real del último commit en GitHub, sin bloquear la carga de la web.
   let fechaAct = s.actualizado || '';
   if (ultimoCambio) {
     const d = new Date(ultimoCambio);
     if (!isNaN(d.getTime())) fechaAct = fechaES(d);
   }
   txt('actualizado', fechaAct);
+  fechaUltimoCambio().then(d => { if (d) txt('actualizado', fechaES(d)); });
   txt('dTitulo', s.destacada_titulo); txt('dEtiqueta', s.destacada_etiqueta);
   txt('dSet', s.destacada_set); txt('dPrecio', s.destacada_precio);
   txt('comproTitulo', s.compro_titulo); txt('comproTexto', s.compro_texto);
