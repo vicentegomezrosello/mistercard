@@ -324,6 +324,8 @@ const COND = c => /psa|bgs|cgc/i.test(c || '') ? '#e0a84e'
   : /light/i.test(c || '') ? '#e8c07a' : '#c98b6b';
 const esc = s => String(s ?? '').replace(/[&<>"]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m]));
 const txt = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v || ''; };
+const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+const fechaES = d => d.getDate() + ' de ' + MESES[d.getMonth()];
 
 let productos = [], apartados = {};
 const APKEYS = ['gradeadas', 'sellado', 'sueltas', 'lotes'];
@@ -615,11 +617,19 @@ document.addEventListener('keydown', e => {
 
 (async () => {
   document.getElementById('anyo').textContent = new Date().getFullYear();
-  const [s, c, a] = await Promise.all([
+  const [s, cRes, a] = await Promise.all([
     fetch('content/sitio.json').then(r => r.json()).catch(() => ({})),
-    fetch('content/cartas.json').then(r => r.json()).catch(() => ({ cartas: [] })),
+    fetch('content/cartas.json').catch(() => null),
     fetch('content/apartados.json').then(r => r.json()).catch(() => ({}))
   ]);
+  // Guardamos la fecha en que el servidor sirvió por última vez el archivo de
+  // productos: es la última vez que se publicó un cambio. Sirve para la fecha
+  // "Actualizado el…" sin tener que escribirla a mano.
+  let c = { cartas: [] }, ultimoCambio = null;
+  if (cRes) {
+    ultimoCambio = cRes.headers.get('last-modified');
+    try { c = await cRes.json(); } catch (e) { c = { cartas: [] }; }
+  }
   // Enlace de contacto. En móvil abre el chat directo (ig.me); en ordenador va al
   // perfil, porque Meta no soporta ig.me en Instagram Web.
   const usuarioIG = (s.handle || '').replace(/^@/, '').trim();
@@ -633,7 +643,14 @@ document.addEventListener('keydown', e => {
   if (s.boton2) txt('boton2', s.boton2);
   if (s.dato1_pie) txt('dato1p', s.dato1_pie);
   txt('dato2', s.dato2); txt('dato2p', s.dato2_pie); txt('dato3', s.dato3); txt('dato3p', s.dato3_pie);
-  txt('actualizado', s.actualizado);
+  // Fecha automática: la del último cambio publicado. Si el servidor no da esa
+  // cabecera, cae al valor manual del panel (por si acaso).
+  let fechaAct = s.actualizado || '';
+  if (ultimoCambio) {
+    const d = new Date(ultimoCambio);
+    if (!isNaN(d.getTime())) fechaAct = fechaES(d);
+  }
+  txt('actualizado', fechaAct);
   txt('dTitulo', s.destacada_titulo); txt('dEtiqueta', s.destacada_etiqueta);
   txt('dSet', s.destacada_set); txt('dPrecio', s.destacada_precio);
   txt('comproTitulo', s.compro_titulo); txt('comproTexto', s.compro_texto);
