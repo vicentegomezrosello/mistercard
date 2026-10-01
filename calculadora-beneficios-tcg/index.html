@@ -221,7 +221,7 @@
           <div class="res-big"><span class="lbl">Beneficio real</span><span class="val" id="rBeneficio">—</span></div>
           <div class="linea"><span class="lbl">ROI</span><span class="val" id="rRoi">—</span></div>
           <div class="linea"><span class="lbl">Inversión total <span class="hint">lo que gastas</span></span><span class="val" id="rInversion">—</span></div>
-          <div class="linea"><span class="lbl">Para reinvertir <span class="hint">recuperas · próxima compra</span></span><span class="val oro" id="rReinvertir">—</span></div>
+          <div class="linea"><span class="lbl">Máximo próxima compra <span class="hint">reserva 50% del beneficio</span></span><span class="val oro" id="rMax">—</span></div>
           <div class="linea"><span class="lbl">Comisión aplicada</span><span class="val" id="rComision">—</span></div>
           <div class="linea"><span class="lbl">Gastos de venta <span class="hint">envío, embalaje, otros</span></span><span class="val" id="rGastos">—</span></div>
           <div class="aviso-perdida" id="avisoPerdida">
@@ -428,7 +428,9 @@ function pintaCalcular() {
   document.getElementById("rRoi").textContent = r.roi === null ? "—" : pctFmt(r.roi * 100);
   document.getElementById("rRoi").className = "val " + (r.roi > 0 ? "pos" : r.roi < 0 ? "neg" : "");
   document.getElementById("rInversion").textContent = money(num("compra") + r.totalExpenses);
-  document.getElementById("rReinvertir").textContent = money(r.netCollection);
+  const reservado = Math.max(0, r.realProfit) * 0.50; // 30% ahorro + 20% personal (oculto en la pública)
+  const maxProxima = Math.max(0, r.netCollection - reservado);
+  document.getElementById("rMax").textContent = money(maxProxima);
   document.getElementById("rComision").textContent = money(r.commission);
   document.getElementById("rGastos").textContent = money(r.totalExpenses);
 
