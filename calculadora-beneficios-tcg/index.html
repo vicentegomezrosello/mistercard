@@ -220,9 +220,10 @@
           <div id="rNombre" style="font-family:var(--disp);font-weight:600;font-size:14px;color:var(--gold);margin-bottom:10px;display:none"></div>
           <div class="res-big"><span class="lbl">Beneficio real</span><span class="val" id="rBeneficio">—</span></div>
           <div class="linea"><span class="lbl">ROI</span><span class="val" id="rRoi">—</span></div>
-          <div class="linea"><span class="lbl">Cobro neto</span><span class="val" id="rNeto">—</span></div>
+          <div class="linea"><span class="lbl">Inversión total <span class="hint">lo que gastas</span></span><span class="val" id="rInversion">—</span></div>
+          <div class="linea"><span class="lbl">Para reinvertir <span class="hint">recuperas · próxima compra</span></span><span class="val oro" id="rReinvertir">—</span></div>
           <div class="linea"><span class="lbl">Comisión aplicada</span><span class="val" id="rComision">—</span></div>
-          <div class="linea"><span class="lbl">Gastos totales</span><span class="val" id="rGastos">—</span></div>
+          <div class="linea"><span class="lbl">Gastos de venta <span class="hint">envío, embalaje, otros</span></span><span class="val" id="rGastos">—</span></div>
           <div class="aviso-perdida" id="avisoPerdida">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4m0 4h.01M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"></path></svg>
             Esta operación generaría una pérdida.
@@ -426,7 +427,8 @@ function pintaCalcular() {
 
   document.getElementById("rRoi").textContent = r.roi === null ? "—" : pctFmt(r.roi * 100);
   document.getElementById("rRoi").className = "val " + (r.roi > 0 ? "pos" : r.roi < 0 ? "neg" : "");
-  document.getElementById("rNeto").textContent = money(r.netCollection);
+  document.getElementById("rInversion").textContent = money(num("compra") + r.totalExpenses);
+  document.getElementById("rReinvertir").textContent = money(r.netCollection);
   document.getElementById("rComision").textContent = money(r.commission);
   document.getElementById("rGastos").textContent = money(r.totalExpenses);
 
