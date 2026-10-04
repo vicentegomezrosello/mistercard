@@ -119,6 +119,18 @@
       "precio": "200",
       "disponibilidad": "Disponible",
       "ref": "Reschar - GX217"
+    },
+    {
+      "apartado": "gradeadas",
+      "foto": "/images/1000227275.webp",
+      "fotos": [],
+      "nombre": "UMBREON VMAX",
+      "set": "Brillian Stars",
+      "juego": "Pokémon",
+      "estado_carta": "PSA 9",
+      "precio": "100",
+      "disponibilidad": "Disponible",
+      "ref": "UBRS TG23"
     }
   ]
 }
