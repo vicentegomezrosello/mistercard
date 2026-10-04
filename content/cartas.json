@@ -104,6 +104,21 @@
       "precio": "100",
       "disponibilidad": "Disponible",
       "ref": "VPP - SWS182"
+    },
+    {
+      "apartado": "gradeadas",
+      "foto": "/images/1000227276.webp",
+      "fotos": [
+        "/images/reshiram-charizard-gx-217-psa-9-frontal-sin-recorte-v4.webp",
+        "/images/reshiram-charizard-gx-217-psa-9-trasera-sin-recorte-v4.webp"
+      ],
+      "nombre": "RESHIRAM CHARIZARD GX 217",
+      "set": "Unbroken bonds",
+      "juego": "Pokémon",
+      "estado_carta": "PSA 9",
+      "precio": "200",
+      "disponibilidad": "Disponible",
+      "ref": "Reschar - GX217"
     }
   ]
 }
