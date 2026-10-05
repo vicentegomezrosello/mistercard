@@ -87,9 +87,10 @@ collections:
               - { label: "Set / detalle", name: set, widget: string, required: false }
               - { label: "Juego", name: juego, widget: select, required: false, options: ["Pokémon", "Riftbound", "One Piece", "Lorcana", "Deportivas", "Otro"] }
               - { label: "Estado", name: estado_carta, widget: string, hint: "Near Mint, Light Play, PSA 10…" }
-              - { label: "Precio", name: precio, widget: string, hint: "Ej: 89 €" }
+              - { label: "Nº de certificación", name: cert, widget: string, required: false, hint: "Solo gradeadas. El número del slab (PSA/CGC/BGS). Vacío en cartas sin gradear." }
+              - { label: "Precio (€)", name: precio, widget: number, value_type: float, min: 0, step: 1, hint: "Solo el número, sin €. Ej: 89. La web añade el € sola." }
               - { label: "Disponibilidad", name: disponibilidad, widget: select, options: ["Disponible", "Reservada", "Vendida"], default: "Disponible" }
-              - { label: "Referencia", name: ref, widget: string, hint: "Ej: MC-021" }
+              - { label: "Referencia", name: ref, widget: string, pattern: ["^MC-[0-9]{3}$", "Formato MC-000 (ej. MC-010)"], hint: "Formato MC-000. Usa el siguiente número libre (ej. MC-010)." }
 
   - name: sitio
     label: "Textos de la web"
@@ -100,7 +101,7 @@ collections:
         fields:
           - { label: "Usuario de Instagram (visible)", name: handle, widget: string }
           - { label: "Enlace a Instagram", name: instagram, widget: string }
-          - { label: "Enlace de WhatsApp (opcional)", name: whatsapp, widget: string, required: false }
+          - { label: "Número de WhatsApp (opcional)", name: whatsapp, widget: string, required: false, hint: "Con prefijo de país, sin espacios ni +. Ej: 34600123456. Si lo rellenas, cada carta tendrá botón de WhatsApp con el mensaje ya escrito." }
           - { label: "Banda superior", name: aviso, widget: string }
           - { label: "Etiqueta pequeña", name: badge, widget: string }
           - { label: "Titular", name: titulo, widget: string }
@@ -116,7 +117,7 @@ collections:
           - { label: "Carta destacada · título", name: destacada_titulo, widget: string }
           - { label: "Carta destacada · etiqueta", name: destacada_etiqueta, widget: string }
           - { label: "Carta destacada · set", name: destacada_set, widget: string }
-          - { label: "Carta destacada · precio", name: destacada_precio, widget: string }
+          - { label: "Carta destacada · precio (€)", name: destacada_precio, widget: number, value_type: float, min: 0, required: false, hint: "Solo el número. La web añade el €." }
           - { label: "Carta que gira · foto (anverso)", name: destacada_foto, widget: image, required: false, hint: "Si pones foto, la carta que gira pasa a ser esta foto entera, sin marco ni textos. Si la dejas vacía, se ve el diseño con marco." }
           - { label: "Carta que gira · foto del reverso", name: destacada_dorso, widget: image, required: false, hint: "Opcional. Si no pones nada, el reverso es la estrella de mistercard." }
           - label: "Cartas por fila (en ordenador)"

@@ -123,6 +123,13 @@
   .item .ph{cursor:zoom-in}
   .multi-badge{position:absolute;bottom:9px;right:9px;z-index:2;background:rgba(10,20,36,.72);border:1px solid rgba(244,236,224,.16);color:#e8eefc;font-size:11px;font-weight:700;padding:4px 9px;border-radius:100px}
   /* Botón de producto vendido: apagado, no se puede pulsar. */
+  .acciones{display:flex;gap:8px;align-items:stretch}
+  .acciones .ask.ig{flex:1;justify-content:center}
+  .ask.wa{background:rgba(37,211,102,.12);border-color:rgba(37,211,102,.4);color:#5fdc8f;justify-content:center}
+  .ask.wa:hover{background:#25d366;color:#0a1424}
+  .acciones.solo-icono .ask.wa{flex:none;padding:7px 10px}
+  .lb-acciones{display:flex;flex-direction:column;gap:9px}
+  .lb-acciones .ask{justify-content:center;padding:11px 14px;font-size:14px}
   .ask.vendida{background:rgba(244,236,224,.05);border-color:rgba(244,236,224,.12);color:#8794ab;cursor:default}
   .ask.vendida:hover{background:rgba(244,236,224,.05);color:#8794ab}
   /* Ficha ampliada (lightbox) */
@@ -328,6 +335,19 @@ const COND = c => /psa|bgs|cgc/i.test(c || '') ? '#e0a84e'
   : /excellent|^ex/i.test(c || '') ? '#8fd0e0'
   : /light/i.test(c || '') ? '#e8c07a' : '#c98b6b';
 const esc = s => String(s ?? '').replace(/[&<>"]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m]));
+// Precio: en el panel es un número (89) y la web añade el € sola. Si queda algún
+// precio antiguo escrito como texto ("100 €" o "100"), también se muestra bien.
+function fmtPrecio(p) {
+  if (p === null || p === undefined || p === '') return '';
+  let n = typeof p === 'number' ? p : parseFloat(String(p).replace(/[^\d,.-]/g, '').replace(/\.(?=\d{3}\b)/g, '').replace(',', '.'));
+  if (isNaN(n)) return String(p);
+  return n.toLocaleString('es-ES', { minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 }) + ' €';
+}
+// WhatsApp: del campo del panel se queda solo con los dígitos (sirve tanto
+// "34600123456" como "+34 600 123 456" o un enlace wa.me antiguo).
+const waNum = v => String(v || '').replace(/\D/g, '');
+const waLink = msg => window.__wa ? 'https://wa.me/' + window.__wa + (msg ? '?text=' + encodeURIComponent(msg) : '') : '';
+const ICO_WA = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="flex:none" aria-hidden="true"><path d="M17.5 14.4c-.3-.1-1.8-.9-2-1-.3-.1-.5-.1-.7.1-.2.3-.8 1-.9 1.2-.2.2-.3.2-.6.1-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.4-.5c.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.3 5.2 4.6.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.8-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.1-.3-.2-.6-.3zM12 2a10 10 0 0 0-8.6 15l-1.4 5 5.2-1.4A10 10 0 1 0 12 2zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3.1.8.8-3-.2-.3A8.2 8.2 0 1 1 12 20.2z"/></svg>';
 const txt = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v || ''; };
 const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
 const fechaES = d => d.getDate() + ' de ' + MESES[d.getMonth()];
@@ -388,10 +408,14 @@ function botonHTML(c, corto) {
   const a = accionDe(c);
   const label = (corto && a.labelCorto) ? a.labelCorto : a.label;
   if (a.vendida) return `<span class="ask vendida" aria-disabled="true">${esc(label)}</span>`;
-  return `<a class="ask ig" href="#" target="_blank" rel="noopener" data-msg="${esc(a.msg)}" data-aviso="${esc(a.aviso)}" aria-label="${esc(a.label)} por Instagram">
+  const ig = `<a class="ask ig" href="#" target="_blank" rel="noopener" data-msg="${esc(a.msg)}" data-aviso="${esc(a.aviso)}" aria-label="${esc(a.label)} por Instagram">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex:none" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle></svg>
-    ${esc(label)}
+    ${esc(label)}${corto ? '' : ' por Instagram'}
   </a>`;
+  if (!window.__wa) return ig;
+  // WhatsApp: el mensaje con la carta y su referencia va ya escrito en el chat.
+  const wa = `<a class="ask wa" href="${esc(waLink(a.msg))}" target="_blank" rel="noopener" aria-label="${esc(a.label)} por WhatsApp">${ICO_WA}${corto ? '' : ' Escribir por WhatsApp'}</a>`;
+  return corto ? `<div class="acciones solo-icono">${ig}${wa}</div>` : `<div class="lb-acciones">${ig}${wa}</div>`;
 }
 
 function cardHTML(c, ratio) {
@@ -415,7 +439,7 @@ function cardHTML(c, ratio) {
       <div style="font-size:12px;color:#8794ab">${esc(c.set)}</div>
       ${estado}
       <div class="foot">
-        <span class="price">${esc(c.precio)}</span>
+        <span class="price">${esc(fmtPrecio(c.precio))}</span>
         ${botonHTML(c, true)}
       </div>
     </div>
@@ -574,7 +598,7 @@ function abreLB(idx) {
     <h3 style="font-family:Sora,sans-serif;font-weight:700;font-size:22px;margin:2px 0 0;line-height:1.2">${esc(c.nombre)}</h3>
     ${c.set ? `<div style="font-size:13px;color:#8794ab">${esc(c.set)}</div>` : ''}
     ${estado}
-    <div class="price" style="font-size:26px;margin-top:4px">${esc(c.precio)}</div>
+    <div class="price" style="font-size:26px;margin-top:4px">${esc(fmtPrecio(c.precio))}</div>
     <div style="font:12px ui-monospace,monospace;color:#8794ab">Ref. ${esc(c.ref || '—')}</div>
     ${c.cert ? `<div style="font:12px ui-monospace,monospace;color:#8794ab">Cert. ${esc(c.cert)}</div>` : ''}
     <div style="margin-top:14px;border-top:1px solid rgba(244,236,224,.09);padding-top:14px;display:flex;flex-direction:column;gap:9px;font-size:13px;color:#c6d0de">
@@ -656,6 +680,11 @@ document.addEventListener('keydown', e => {
   window.__perfil = s.instagram || '#';
   window.__ig = (enMovil && usuarioIG) ? 'https://ig.me/m/' + encodeURIComponent(usuarioIG) : window.__perfil;
   document.querySelectorAll('.ig').forEach(a => { a.href = window.__ig; });
+  window.__wa = waNum(s.whatsapp);
+  if (window.__wa) {
+    const baj = document.querySelector('#escaparate .bajada');
+    if (baj) baj.textContent = 'Toca «Consultar» en la carta que te interese y me escribes por Instagram o WhatsApp con su referencia.';
+  }
   document.querySelectorAll('.handle').forEach(e => e.textContent = s.handle || '');
   txt('aviso', s.aviso); txt('badge', s.badge); txt('titulo', s.titulo); txt('intro', s.intro);
   if (s.boton1) txt('boton1', s.boton1);
@@ -673,7 +702,7 @@ document.addEventListener('keydown', e => {
   txt('actualizado', fechaAct);
   fechaUltimoCambio().then(d => { if (d) txt('actualizado', fechaES(d)); });
   txt('dTitulo', s.destacada_titulo); txt('dEtiqueta', s.destacada_etiqueta);
-  txt('dSet', s.destacada_set); txt('dPrecio', s.destacada_precio);
+  txt('dSet', s.destacada_set); txt('dPrecio', fmtPrecio(s.destacada_precio));
   txt('comproTitulo', s.compro_titulo); txt('comproTexto', s.compro_texto);
   // Sección "Compro colecciones": se puede apagar entera desde el panel.
   // Si el campo no existe todavía, se considera encendida.
@@ -697,7 +726,7 @@ document.addEventListener('keydown', e => {
   const cols = parseInt(s.columnas, 10);
   document.documentElement.style.setProperty('--cols', (cols >= 1 && cols <= 6) ? cols : 4);
   montaDestacada(s);
-  if (s.whatsapp) document.getElementById('wa').innerHTML = `También por <a href="${esc(s.whatsapp)}" target="_blank" rel="noopener">WhatsApp</a> si lo prefieres`;
+  if (window.__wa) document.getElementById('wa').innerHTML = `También por <a href="${esc(waLink('Hola! Vengo de la web.'))}" target="_blank" rel="noopener">WhatsApp</a> si lo prefieres`;
   // Rejilla de fotos del feed: si no hay fotos, no se pinta nada (antes salían
   // nueve cuadrados grises de relleno).
   const feed = (s.feed || []).map(f => typeof f === 'string' ? f : (f && (f.foto || f.img))).filter(Boolean);

@@ -11,9 +11,9 @@
       "set": "Pokémon (1998) Japanese",
       "juego": "Pokémon",
       "estado_carta": "CGC 9",
-      "precio": "620 €",
+      "precio": 620,
       "disponibilidad": "Disponible",
-      "ref": "CDPROMO - BLASTOISE"
+      "ref": "MC-001"
     },
     {
       "apartado": "gradeadas",
@@ -26,9 +26,9 @@
       "set": "Shining Fates",
       "juego": "Pokémon",
       "estado_carta": "BGS 9.5",
-      "precio": "200 €",
+      "precio": 200,
       "disponibilidad": "Disponible",
-      "ref": "SV107- CHARIZARD"
+      "ref": "MC-002"
     },
     {
       "apartado": "gradeadas",
@@ -41,9 +41,9 @@
       "set": "Astral Radiance",
       "juego": "Pokémon",
       "estado_carta": "PSA 9",
-      "precio": "170 €",
+      "precio": 170,
       "disponibilidad": "Disponible",
-      "ref": "MACHAMP - 172"
+      "ref": "MC-003"
     },
     {
       "apartado": "gradeadas",
@@ -56,9 +56,9 @@
       "set": "Black Star",
       "juego": "Pokémon",
       "estado_carta": "BGS 9",
-      "precio": "140 €",
+      "precio": 140,
       "disponibilidad": "Disponible",
-      "ref": "MZA- 210"
+      "ref": "MC-004"
     },
     {
       "apartado": "gradeadas",
@@ -71,9 +71,9 @@
       "set": "Corona Astral",
       "juego": "Pokémon",
       "estado_carta": "PSA 10",
-      "precio": "200 €",
+      "precio": 200,
       "disponibilidad": "Disponible",
-      "ref": "TERAPAGOS - 170"
+      "ref": "MC-005"
     },
     {
       "apartado": "gradeadas",
@@ -86,9 +86,9 @@
       "set": "REACTIVE ORANGE",
       "juego": "Deportivas",
       "estado_carta": "PSA 10",
-      "precio": "200 €",
+      "precio": 200,
       "disponibilidad": "Disponible",
-      "ref": "AED - RC"
+      "ref": "MC-006"
     },
     {
       "apartado": "gradeadas",
@@ -101,9 +101,9 @@
       "set": "Promo",
       "juego": "Pokémon",
       "estado_carta": "BGS 9",
-      "precio": "100 €",
+      "precio": 100,
       "disponibilidad": "Disponible",
-      "ref": "VPP - SWS182"
+      "ref": "MC-007"
     },
     {
       "apartado": "gradeadas",
@@ -116,9 +116,9 @@
       "set": "Unbroken bonds",
       "juego": "Pokémon",
       "estado_carta": "PSA 9",
-      "precio": "200 €",
+      "precio": 200,
       "disponibilidad": "Disponible",
-      "ref": "Reschar - GX217"
+      "ref": "MC-008"
     },
     {
       "apartado": "gradeadas",
@@ -128,9 +128,9 @@
       "set": "Brillian Stars",
       "juego": "Pokémon",
       "estado_carta": "PSA 9",
-      "precio": "100 €",
+      "precio": 100,
       "disponibilidad": "Disponible",
-      "ref": "UBRS TG23"
+      "ref": "MC-009"
     }
   ]
 }

@@ -17,7 +17,7 @@
   "destacada_titulo": "Pieza de la semana",
   "destacada_etiqueta": "CGC 9",
   "destacada_set": "BLASTOISE CD PROMO",
-  "destacada_precio": "620 €",
+  "destacada_precio": 620,
   "destacada_foto": "/images/1000226596.webp",
   "destacada_dorso": "",
   "columnas": "5",
@@ -26,7 +26,7 @@
   "pasos": [
     {
       "titulo": "Me escribes por Instagram",
-      "texto": "Con la referencia (MC-014) o una captura de la carta que quieres."
+      "texto": "Con la referencia (por ejemplo, MC-001) o una captura de la carta que quieres."
     },
     {
       "titulo": "Te confirmo y reservo",
