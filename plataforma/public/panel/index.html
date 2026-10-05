@@ -1,0 +1,611 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0a1424">
+<title>Panel de la tienda</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<style>
+  :root{--ac:#e0a84e;--fo:#0a1424;--sup:#111d31;--sup2:#16253d;--lin:rgba(244,236,224,.1);--tx:#f4ece0;--tx2:#9aa8bd;--ok:#7dd6a0;--res:#e8c07a;--ven:#8794ab;--mal:#ef7d6d}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;background:var(--fo);color:var(--tx);font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  button,input,select,textarea{font:inherit;color:inherit}
+  a{color:var(--ac)}
+  .oculto{display:none!important}
+  /* Login */
+  #login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+  .caja{width:100%;max-width:380px;background:var(--sup);border:1px solid var(--lin);border-radius:18px;padding:26px}
+  h1{font-size:22px;margin:0 0 6px}
+  h2{font-size:17px;margin:0 0 12px}
+  .sub{color:var(--tx2);font-size:14px;margin:0 0 20px}
+  label{display:block;font-size:13px;font-weight:600;color:var(--tx2);margin:14px 0 6px}
+  input[type=text],input[type=password],input[type=number],input[type=tel],input:not([type]),select,textarea{width:100%;background:var(--fo);border:1px solid var(--lin);border-radius:11px;padding:12px 13px;font-size:16px;outline:none}
+  input:focus,select:focus,textarea:focus{border-color:var(--ac)}
+  textarea{min-height:90px;resize:vertical}
+  .btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;border:none;border-radius:12px;padding:14px 16px;font-weight:700;font-size:16px;background:var(--ac);color:var(--fo);cursor:pointer}
+  .btn.sec{background:var(--sup2);color:var(--tx);border:1px solid var(--lin)}
+  .btn.peligro{background:none;color:var(--mal);border:1px solid rgba(239,125,109,.4)}
+  .btn:disabled{opacity:.55}
+  .msg{margin-top:12px;font-size:14px;color:var(--mal);min-height:1em}
+  /* Estructura */
+  header{position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:10px;padding:12px 16px;padding-top:max(12px,env(safe-area-inset-top));background:rgba(10,20,36,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--lin)}
+  header .nom{font-weight:800;font-size:16px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  header a{font-size:13px;font-weight:700;white-space:nowrap}
+  main{padding:14px 14px 110px;max-width:760px;margin:0 auto}
+  nav.abajo{position:fixed;left:0;right:0;bottom:0;z-index:10;display:grid;grid-template-columns:repeat(4,1fr);background:rgba(13,23,40,.97);border-top:1px solid var(--lin);padding-bottom:env(safe-area-inset-bottom)}
+  nav.abajo button{background:none;border:none;padding:9px 4px 10px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:600;color:var(--tx2);cursor:pointer}
+  nav.abajo button svg{width:23px;height:23px}
+  nav.abajo button.on{color:var(--ac)}
+  nav.abajo .mas span.c{width:44px;height:44px;margin-top:-20px;border-radius:50%;background:var(--ac);color:var(--fo);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(0,0,0,.45)}
+  .banda{background:rgba(239,125,109,.14);border:1px solid rgba(239,125,109,.4);color:#f5b3a8;border-radius:12px;padding:12px 14px;font-size:14px;margin-bottom:12px}
+  .banda.info{background:rgba(224,168,78,.1);border-color:rgba(224,168,78,.35);color:#eccb8f}
+  /* Lista de cartas */
+  .filtros{display:flex;gap:7px;overflow-x:auto;padding-bottom:4px;margin-bottom:10px;scrollbar-width:none}
+  .filtros::-webkit-scrollbar{display:none}
+  .chip{flex:none;border:1px solid var(--lin);background:var(--sup);border-radius:100px;padding:7px 13px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
+  .chip.on{background:var(--ac);border-color:var(--ac);color:var(--fo)}
+  .buscar{margin-bottom:10px}
+  .ap-t{font-size:13px;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.04em;margin:18px 2px 8px;display:flex;justify-content:space-between}
+  .carta{display:grid;grid-template-columns:64px 1fr;gap:12px;background:var(--sup);border:1px solid var(--lin);border-radius:14px;padding:10px;margin-bottom:9px}
+  .carta .mini{width:64px;height:84px;border-radius:9px;background:var(--sup2) center/cover no-repeat;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--tx2);cursor:pointer}
+  .carta .info{min-width:0;display:flex;flex-direction:column;gap:3px}
+  .carta .fila1{display:flex;justify-content:space-between;gap:8px;cursor:pointer}
+  .carta .n{font-weight:700;font-size:15px;line-height:1.25;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+  .carta .ref{font:12px ui-monospace,monospace;color:var(--tx2);flex:none}
+  .carta .det{font-size:12.5px;color:var(--tx2)}
+  .carta .pr{font-weight:800;color:var(--ac)}
+  .estados{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:6px}
+  .estados button{border:1px solid var(--lin);background:var(--fo);border-radius:9px;padding:8px 2px;font-size:12.5px;font-weight:700;color:var(--tx2);cursor:pointer}
+  .estados button.on[data-e=Disponible]{background:var(--ok);border-color:var(--ok);color:#0a1424}
+  .estados button.on[data-e=Reservada]{background:var(--res);border-color:var(--res);color:#0a1424}
+  .estados button.on[data-e=Vendida]{background:#3a4559;border-color:#3a4559;color:#e6ebf3}
+  .mover{display:flex;gap:5px;margin-top:6px}
+  .mover button{flex:1;border:1px solid var(--lin);background:none;border-radius:8px;padding:5px;font-size:12px;color:var(--tx2);cursor:pointer}
+  .vacio{text-align:center;color:var(--tx2);padding:40px 16px}
+  /* Formulario de carta */
+  .fotos{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .fotos .f{position:relative;aspect-ratio:63/88;border-radius:10px;background:var(--sup2) center/cover no-repeat;border:1px solid var(--lin)}
+  .fotos .f.prin{outline:2px solid var(--ac);outline-offset:1px}
+  .fotos .f .x{position:absolute;top:4px;right:4px;width:26px;height:26px;border-radius:50%;border:none;background:rgba(10,20,36,.85);color:#fff;font-size:15px;cursor:pointer}
+  .fotos .f .izq{position:absolute;bottom:4px;left:4px;border:none;border-radius:7px;background:rgba(10,20,36,.85);color:#fff;font-size:11px;padding:3px 6px;cursor:pointer}
+  .fotos .f .et{position:absolute;bottom:4px;right:4px;background:var(--ac);color:var(--fo);font-size:10px;font-weight:800;border-radius:6px;padding:2px 5px}
+  .fotos .f.subiendo::after{content:"Subiendo…";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(10,20,36,.7);font-size:12px;border-radius:10px}
+  .dosbtn{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+  .seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:5px}
+  .seg button{border:1px solid var(--lin);background:var(--fo);border-radius:10px;padding:10px 4px;font-size:13px;font-weight:700;color:var(--tx2);cursor:pointer}
+  .seg button.on{background:var(--ac);border-color:var(--ac);color:var(--fo)}
+  .sugerencias{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px}
+  .sugerencias button{border:1px solid var(--lin);background:var(--sup);border-radius:100px;padding:5px 11px;font-size:12.5px;color:var(--tx2);cursor:pointer}
+  .bloque{background:var(--sup);border:1px solid var(--lin);border-radius:16px;padding:16px;margin-bottom:12px}
+  .bloque>h2{margin-bottom:2px}
+  .bloque .ayuda{color:var(--tx2);font-size:13px;margin:0 0 4px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .acciones{display:flex;flex-direction:column;gap:9px;margin-top:18px}
+  .colores{display:flex;flex-wrap:wrap;gap:9px;align-items:center}
+  .colores button{width:38px;height:38px;border-radius:50%;border:2px solid transparent;cursor:pointer}
+  .colores button.on{border-color:#fff}
+  .colores input[type=color]{width:44px;height:40px;border:none;background:none;padding:0}
+  .interruptor{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px}
+  .interruptor input{width:22px;height:22px;accent-color:var(--ac)}
+  .lista-ed{display:flex;flex-direction:column;gap:7px}
+  .lista-ed .it{display:flex;gap:6px}
+  .lista-ed .it input{flex:1}
+  .lista-ed .it button{flex:none;width:44px;border:1px solid var(--lin);background:var(--fo);border-radius:11px;color:var(--mal);font-size:18px;cursor:pointer}
+  .mas-item{margin-top:7px;border:1px dashed var(--lin);background:none;border-radius:11px;padding:10px;width:100%;color:var(--tx2);font-weight:600;cursor:pointer}
+  .ap-ed{display:grid;grid-template-columns:1fr 64px 44px;gap:7px;align-items:center;margin-top:8px}
+  .ap-ed input[type=checkbox]{width:22px;height:22px;accent-color:var(--ac);justify-self:center}
+  .aviso{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--tx);color:var(--fo);font-weight:700;font-size:14px;padding:11px 18px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.5);z-index:50;max-width:calc(100vw - 32px);text-align:center}
+  .aviso.mal{background:var(--mal);color:#fff}
+  .guardar-fijo{position:sticky;bottom:calc(70px + env(safe-area-inset-bottom));z-index:5;margin-top:14px}
+</style>
+</head>
+<body>
+
+<section id="login" class="oculto">
+  <form class="caja" id="fLogin">
+    <h1>Panel de tu tienda</h1>
+    <p class="sub">Entra con el usuario y la contraseña que te hemos enviado.</p>
+    <label for="lUsuario">Usuario</label>
+    <input id="lUsuario" autocomplete="username" autocapitalize="none" spellcheck="false" required>
+    <label for="lClave">Contraseña</label>
+    <input id="lClave" type="password" autocomplete="current-password" required>
+    <div style="height:18px"></div>
+    <button class="btn" type="submit">Entrar</button>
+    <div class="msg" id="lMsg" role="alert"></div>
+  </form>
+</section>
+
+<div id="app" class="oculto">
+  <header>
+    <div class="nom" id="hNombre"></div>
+    <a id="hVer" href="/" target="_blank" rel="noopener">Ver mi tienda ↗</a>
+  </header>
+  <main id="vista"></main>
+  <nav class="abajo" aria-label="Secciones">
+    <button data-v="cartas" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="12" height="16" rx="2"/><path d="M8 21h10a2 2 0 0 0 2-2V7"/></svg>Cartas</button>
+    <button data-v="nueva" class="mas"><span class="c"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M12 5v14M5 12h14"/></svg></span>Añadir</button>
+    <button data-v="tienda"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l1.5-5h15L21 9M4 9v11h16V9M3 9h18M9 20v-6h6v6"/></svg>Mi tienda</button>
+    <button data-v="cuenta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></svg>Cuenta</button>
+  </nav>
+</div>
+
+<input type="file" id="inCamara" accept="image/*" capture="environment" class="oculto">
+<input type="file" id="inGaleria" accept="image/*" multiple class="oculto">
+<input type="file" id="inLogo" accept="image/*" class="oculto">
+
+<script>
+'use strict';
+// ------------------------------------------------------------ utilidades
+const $ = (s, el = document) => el.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+const QS = new URLSearchParams(location.search);
+const V = QS.get('v');                       // el superadmin entra como vendedor con ?v=
+const conV = r => V ? r + (r.includes('?') ? '&' : '?') + 'v=' + encodeURIComponent(V) : r;
+const precio = p => (p === null || p === undefined || p === '') ? '' : Number(p).toLocaleString('es-ES', { minimumFractionDigits: Number(p) % 1 ? 2 : 0, maximumFractionDigits: 2 }) + ' €';
+
+async function api(ruta, opciones = {}) {
+  const o = { method: 'GET', credentials: 'same-origin', ...opciones, headers: { ...(opciones.headers || {}) } };
+  if (o.body && typeof o.body === 'object' && !(o.body instanceof Blob)) {
+    o.body = JSON.stringify(o.body); o.headers['content-type'] = 'application/json';
+  }
+  const r = await fetch(conV('/api' + ruta), o);
+  const j = await r.json().catch(() => ({}));
+  if (r.status === 401 && ruta !== '/login') { muestraLogin(); throw new Error('Sesión caducada'); }
+  if (!r.ok) throw new Error(j.error || 'Error ' + r.status);
+  return j;
+}
+
+let relojAviso;
+function aviso(txt, mal) {
+  let el = $('.aviso');
+  if (!el) { el = document.createElement('div'); el.className = 'aviso'; el.setAttribute('role', 'status'); document.body.appendChild(el); }
+  el.textContent = txt; el.classList.toggle('mal', !!mal); el.classList.remove('oculto');
+  clearTimeout(relojAviso); relojAviso = setTimeout(() => el.classList.add('oculto'), mal ? 4500 : 2200);
+}
+
+// Comprime la foto en el propio móvil antes de subirla: lado largo 1600 px, WebP
+// (o JPEG si el navegador no sabe hacer WebP). Una foto de 5 MB queda en ~250 KB.
+async function comprime(archivo, lado = 1600) {
+  let img;
+  try { img = await createImageBitmap(archivo, { imageOrientation: 'from-image' }); }
+  catch (e) {
+    img = await new Promise((ok, mal) => { const i = new Image(); i.onload = () => ok(i); i.onerror = mal; i.src = URL.createObjectURL(archivo); });
+  }
+  const w0 = img.width || img.naturalWidth, h0 = img.height || img.naturalHeight;
+  const k = Math.min(1, lado / Math.max(w0, h0));
+  const w = Math.round(w0 * k), h = Math.round(h0 * k);
+  const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+  cv.getContext('2d').drawImage(img, 0, 0, w, h);
+  const blob = t => new Promise(ok => cv.toBlob(ok, t, 0.82));
+  let b = await blob('image/webp');
+  if (!b || b.type !== 'image/webp') b = await blob('image/jpeg');
+  return b;
+}
+
+async function subeFoto(archivo, lado) {
+  const b = await comprime(archivo, lado);
+  const r = await fetch(conV('/api/panel/fotos'), { method: 'POST', credentials: 'same-origin', headers: { 'content-type': b.type }, body: b });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.error || 'No se pudo subir la foto');
+  return j.clave;
+}
+const urlImg = k => '/img/' + k;
+
+// ------------------------------------------------------------ estado
+let YO = null, CARTAS = [], CFG = null, filtro = 'todas', busca = '';
+
+async function arranca() {
+  try { YO = await api('/yo'); }
+  catch (e) { return muestraLogin(); }
+  if (!YO.vendedor) {
+    if (YO.rol === 'super') { location.href = '/superpanel/'; return; }
+    return muestraLogin();
+  }
+  CFG = YO.vendedor.config;
+  document.documentElement.style.setProperty('--ac', CFG.color || '#e0a84e');
+  $('#login').classList.add('oculto'); $('#app').classList.remove('oculto');
+  $('#hNombre').textContent = YO.vendedor.nombre + (V ? ' · (modo admin)' : '');
+  const enPlataforma = /workers\.dev$|^localhost$|^127\./.test(location.hostname) || V;
+  $('#hVer').href = enPlataforma ? `/t/${YO.vendedor.id}/` : '/';
+  if (enPlataforma && YO.vendedor.dominio && !V) $('#hVer').href = 'https://' + YO.vendedor.dominio + '/';
+  await cargaCartas();
+  ir(location.hash.slice(1) || 'cartas');
+}
+
+function muestraLogin() {
+  $('#app').classList.add('oculto'); $('#login').classList.remove('oculto');
+  setTimeout(() => $('#lUsuario').focus(), 50);
+}
+
+$('#fLogin').addEventListener('submit', async e => {
+  e.preventDefault();
+  const b = $('#fLogin button'); b.disabled = true; $('#lMsg').textContent = '';
+  try {
+    await api('/login', { method: 'POST', body: { usuario: $('#lUsuario').value, clave: $('#lClave').value } });
+    $('#lClave').value = '';
+    await arranca();
+  } catch (err) { $('#lMsg').textContent = err.message; }
+  b.disabled = false;
+});
+
+async function cargaCartas() {
+  CARTAS = (await api('/panel/cartas')).cartas;
+}
+
+document.querySelectorAll('nav.abajo button').forEach(b => b.addEventListener('click', () => ir(b.dataset.v)));
+window.addEventListener('hashchange', () => { const v = location.hash.slice(1); if (v && v !== vistaActual) ir(v, true); });
+
+let vistaActual = '';
+function ir(v, desdeHash) {
+  const [nombre, id] = v.split(':');
+  vistaActual = v;
+  if (!desdeHash) history.replaceState(null, '', '#' + v);
+  document.querySelectorAll('nav.abajo button').forEach(b => b.classList.toggle('on', b.dataset.v === (nombre === 'editar' ? 'cartas' : nombre)));
+  window.scrollTo(0, 0);
+  if (nombre === 'cartas') return vistaCartas();
+  if (nombre === 'nueva') return vistaCarta(null);
+  if (nombre === 'editar') return vistaCarta(CARTAS.find(c => c.id === id) || null);
+  if (nombre === 'tienda') return vistaTienda();
+  if (nombre === 'cuenta') return vistaCuenta();
+  vistaCartas();
+}
+
+function bandaEstado() {
+  if (YO.vendedor.estado === 'pausado') return '<div class="banda">Tu tienda está en pausa: la web no muestra las cartas y no puedes hacer cambios. Contacta con soporte para reactivarla.</div>';
+  return '';
+}
+
+// ------------------------------------------------------------ vista: cartas
+function vistaCartas() {
+  const n = { todas: CARTAS.length, Disponible: 0, Reservada: 0, Vendida: 0 };
+  CARTAS.forEach(c => n[c.disponibilidad]++);
+  const nomAp = k => (CFG.apartados[k] && CFG.apartados[k].nombre) || k;
+  const vis = CARTAS.filter(c => (filtro === 'todas' || c.disponibilidad === filtro) &&
+    (!busca || (c.nombre + ' ' + c.ref + ' ' + (c.set_detalle || '')).toLowerCase().includes(busca.toLowerCase())));
+  let html = bandaEstado() + `<div class="filtros">${['todas', 'Disponible', 'Reservada', 'Vendida'].map(f =>
+    `<button class="chip${filtro === f ? ' on' : ''}" data-f="${f}">${f === 'todas' ? 'Todas' : f + 's'} · ${n[f]}</button>`).join('')}</div>`;
+  if (CARTAS.length > 6) html += `<input class="buscar" id="busca" type="search" placeholder="Buscar por nombre o referencia" value="${esc(busca)}">`;
+  if (!CARTAS.length) {
+    html += `<div class="vacio"><p style="font-size:17px;color:var(--tx);font-weight:700">Aún no tienes cartas</p><p>Pulsa el botón <b>+</b> de abajo para añadir la primera. Puedes hacerle la foto con el móvil.</p></div>`;
+  } else if (!vis.length) {
+    html += '<div class="vacio">No hay cartas con este filtro.</div>';
+  }
+  for (const ap of YO.apartados) {
+    const lista = vis.filter(c => c.apartado === ap);
+    if (!lista.length) continue;
+    const apagado = CFG.apartados[ap] && !CFG.apartados[ap].visible;
+    html += `<div class="ap-t"><span>${esc(nomAp(ap))}${apagado ? ' · oculto en la web' : ''}</span><span>${lista.length}</span></div>`;
+    lista.forEach((c, i) => {
+      const f = c.fotos[0];
+      html += `<div class="carta" data-id="${c.id}">
+        <div class="mini" data-ed style="${f ? `background-image:url('${urlImg(f)}')` : ''}">${f ? '' : 'sin foto'}</div>
+        <div class="info">
+          <div class="fila1" data-ed><span class="n">${esc(c.nombre)}</span><span class="ref">${esc(c.ref)}</span></div>
+          <div class="det">${esc([c.estado_carta, c.juego].filter(Boolean).join(' · '))} ${c.precio !== null ? `· <span class="pr">${precio(c.precio)}</span>` : ''}</div>
+          <div class="estados">${YO.disponibilidad.map(e => `<button data-e="${e}" class="${c.disponibilidad === e ? 'on' : ''}" aria-pressed="${c.disponibilidad === e}">${e}</button>`).join('')}</div>
+          ${filtro === 'todas' && !busca ? `<div class="mover"><button data-m="-1" ${i === 0 ? 'disabled' : ''} aria-label="Subir">↑ Subir</button><button data-m="1" ${i === lista.length - 1 ? 'disabled' : ''} aria-label="Bajar">↓ Bajar</button></div>` : ''}
+        </div>
+      </div>`;
+    });
+  }
+  const vista = $('#vista'); vista.innerHTML = html;
+  vista.querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => { filtro = b.dataset.f; vistaCartas(); }));
+  const bs = $('#busca');
+  if (bs) bs.addEventListener('input', () => { busca = bs.value; const p = bs.selectionStart; vistaCartas(); const nb = $('#busca'); nb.focus(); nb.setSelectionRange(p, p); });
+  vista.querySelectorAll('.carta').forEach(el => {
+    const id = el.dataset.id;
+    el.querySelectorAll('[data-ed]').forEach(x => x.addEventListener('click', () => ir('editar:' + id)));
+    el.querySelectorAll('.estados button').forEach(b => b.addEventListener('click', () => cambiaEstado(id, b.dataset.e)));
+    el.querySelectorAll('.mover button').forEach(b => b.addEventListener('click', () => mueve(id, +b.dataset.m)));
+  });
+}
+
+async function cambiaEstado(id, e) {
+  const c = CARTAS.find(x => x.id === id);
+  if (!c || c.disponibilidad === e) return;
+  const antes = c.disponibilidad;
+  c.disponibilidad = e; vistaCartas();
+  try { await api(`/panel/cartas/${id}/estado`, { method: 'POST', body: { disponibilidad: e } }); aviso(`${c.ref}: ${e}`); }
+  catch (err) { c.disponibilidad = antes; vistaCartas(); aviso(err.message, true); }
+}
+
+async function mueve(id, d) {
+  const c = CARTAS.find(x => x.id === id);
+  const grupo = CARTAS.filter(x => x.apartado === c.apartado);
+  const i = grupo.indexOf(c), j = i + d;
+  if (j < 0 || j >= grupo.length) return;
+  [grupo[i], grupo[j]] = [grupo[j], grupo[i]];
+  const resto = CARTAS.filter(x => x.apartado !== c.apartado);
+  CARTAS = [...resto, ...grupo].sort((a, b) => YO.apartados.indexOf(a.apartado) - YO.apartados.indexOf(b.apartado));
+  vistaCartas();
+  try { await api('/panel/orden', { method: 'POST', body: { ids: grupo.map(x => x.id) } }); }
+  catch (err) { aviso(err.message, true); await cargaCartas(); vistaCartas(); }
+}
+
+// ------------------------------------------------------------ vista: añadir / editar carta
+const SUG_ESTADO = ['PSA 10', 'PSA 9', 'CGC 10', 'BGS 9.5', 'Near Mint', 'Excellent', 'Light Play', 'Precintado'];
+let borrador = null;
+
+function vistaCarta(c) {
+  const nueva = !c;
+  borrador = nueva
+    ? { nombre: '', apartado: 'sueltas', juego: 'Pokémon', set_detalle: '', estado_carta: '', cert: '', precio: '', disponibilidad: 'Disponible', fotos: [] }
+    : { ...c, fotos: [...c.fotos] };
+  const nomAp = k => (CFG.apartados[k] && CFG.apartados[k].nombre) || k;
+  $('#vista').innerHTML = bandaEstado() + `
+    <h1 style="margin:4px 2px 14px">${nueva ? 'Añadir carta' : 'Editar ' + esc(c.ref)}</h1>
+    <div class="bloque">
+      <h2>Fotos</h2>
+      <p class="ayuda">La primera es la principal. Hasta 8 fotos.</p>
+      <div class="fotos" id="fotos"></div>
+      <div class="dosbtn">
+        <button class="btn" id="bCamara" type="button">📷 Hacer foto</button>
+        <button class="btn sec" id="bGaleria" type="button">🖼️ Galería</button>
+      </div>
+    </div>
+    <div class="bloque">
+      <label for="cNombre" style="margin-top:0">Nombre *</label>
+      <input id="cNombre" value="${esc(borrador.nombre)}" placeholder="Ej: Charizard VMAX" required>
+      <label>Apartado</label>
+      <div class="seg" id="cApartado">${YO.apartados.map(a => `<button type="button" data-v="${a}" class="${borrador.apartado === a ? 'on' : ''}">${esc(nomAp(a).replace(/^(Cartas|Producto|Lotes y) /i, ''))}</button>`).join('')}</div>
+      <div class="grid2">
+        <div><label for="cJuego">Juego</label>
+          <select id="cJuego">${YO.juegos.map(j => `<option${borrador.juego === j ? ' selected' : ''}>${esc(j)}</option>`).join('')}${borrador.juego && !YO.juegos.includes(borrador.juego) ? `<option selected>${esc(borrador.juego)}</option>` : ''}</select></div>
+        <div><label for="cPrecio">Precio (€)</label>
+          <input id="cPrecio" type="text" inputmode="decimal" value="${borrador.precio ?? ''}" placeholder="Ej: 89"></div>
+      </div>
+      <label for="cSet">Set / detalle</label>
+      <input id="cSet" value="${esc(borrador.set_detalle || '')}" placeholder="Ej: Shining Fates">
+      <label for="cEstado">Estado de la carta</label>
+      <input id="cEstado" value="${esc(borrador.estado_carta || '')}" placeholder="Ej: PSA 10, Near Mint…">
+      <div class="sugerencias">${SUG_ESTADO.map(s => `<button type="button" data-s="${esc(s)}">${esc(s)}</button>`).join('')}</div>
+      <label for="cCert">Nº de certificación (solo gradeadas)</label>
+      <input id="cCert" value="${esc(borrador.cert || '')}" inputmode="numeric" placeholder="Opcional">
+      <label>Disponibilidad</label>
+      <div class="seg" id="cDisp">${YO.disponibilidad.map(d => `<button type="button" data-v="${d}" class="${borrador.disponibilidad === d ? 'on' : ''}">${d}</button>`).join('')}</div>
+      ${nueva ? '<p class="ayuda" style="margin-top:12px">La referencia (ej. ' + esc(YO.vendedor.prefijo) + '-012) se pone sola al guardar.</p>' : ''}
+    </div>
+    <div class="acciones">
+      <button class="btn" id="bGuardar" type="button">${nueva ? 'Publicar carta' : 'Guardar cambios'}</button>
+      ${nueva ? '' : '<button class="btn peligro" id="bBorrar" type="button">Borrar carta</button>'}
+      <button class="btn sec" id="bVolver" type="button">Volver</button>
+    </div>`;
+  pintaFotos();
+  $('#bCamara').onclick = () => $('#inCamara').click();
+  $('#bGaleria').onclick = () => $('#inGaleria').click();
+  document.querySelectorAll('#cApartado button,#cDisp button').forEach(b => b.addEventListener('click', () => {
+    b.parentElement.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
+  }));
+  document.querySelectorAll('.sugerencias button').forEach(b => b.addEventListener('click', () => { $('#cEstado').value = b.dataset.s; }));
+  $('#bGuardar').onclick = () => guardaCarta(c);
+  $('#bVolver').onclick = () => ir('cartas');
+  if (!nueva) $('#bBorrar').onclick = () => borraCarta(c);
+}
+
+let subiendo = 0;
+function pintaFotos() {
+  const cont = $('#fotos'); if (!cont) return;
+  cont.innerHTML = borrador.fotos.map((f, i) => `<div class="f${i === 0 ? ' prin' : ''}" style="background-image:url('${urlImg(f)}')">
+      <button class="x" data-i="${i}" aria-label="Quitar foto">×</button>
+      ${i > 0 ? `<button class="izq" data-i="${i}">Principal</button>` : '<span class="et">Principal</span>'}
+    </div>`).join('') + Array.from({ length: subiendo }, () => '<div class="f subiendo"></div>').join('');
+  cont.querySelectorAll('.x').forEach(b => b.onclick = () => { borrador.fotos.splice(+b.dataset.i, 1); pintaFotos(); });
+  cont.querySelectorAll('.izq').forEach(b => b.onclick = () => { const [f] = borrador.fotos.splice(+b.dataset.i, 1); borrador.fotos.unshift(f); pintaFotos(); });
+}
+
+async function anadeFotos(archivos) {
+  const lista = Array.from(archivos).slice(0, 8 - borrador.fotos.length);
+  if (!lista.length) return aviso('Máximo 8 fotos por carta', true);
+  subiendo += lista.length; pintaFotos();
+  for (const a of lista) {
+    try { borrador.fotos.push(await subeFoto(a)); }
+    catch (err) { aviso(err.message, true); }
+    subiendo--; pintaFotos();
+  }
+}
+$('#inCamara').addEventListener('change', e => { if (e.target.files.length) anadeFotos(e.target.files); e.target.value = ''; });
+$('#inGaleria').addEventListener('change', e => { if (e.target.files.length) anadeFotos(e.target.files); e.target.value = ''; });
+
+async function guardaCarta(c) {
+  if (subiendo) return aviso('Espera a que terminen de subir las fotos', true);
+  const datos = {
+    nombre: $('#cNombre').value.trim(),
+    apartado: $('#cApartado .on').dataset.v,
+    juego: $('#cJuego').value,
+    precio: $('#cPrecio').value.trim(),
+    set: $('#cSet').value.trim(),
+    estado_carta: $('#cEstado').value.trim(),
+    cert: $('#cCert').value.trim(),
+    disponibilidad: $('#cDisp .on').dataset.v,
+    fotos: borrador.fotos
+  };
+  if (!datos.nombre) { $('#cNombre').focus(); return aviso('Escribe el nombre de la carta', true); }
+  const b = $('#bGuardar'); b.disabled = true;
+  try {
+    if (c) { await api('/panel/cartas/' + c.id, { method: 'PUT', body: datos }); aviso('Cambios guardados'); }
+    else { const r = await api('/panel/cartas', { method: 'POST', body: datos }); aviso(`Publicada como ${r.ref}`); }
+    await cargaCartas(); ir('cartas');
+  } catch (err) { aviso(err.message, true); b.disabled = false; }
+}
+
+async function borraCarta(c) {
+  if (!confirm(`¿Borrar ${c.ref} · ${c.nombre}? No se puede deshacer.\n\nSi solo se ha vendido, mejor márcala como «Vendida».`)) return;
+  try { await api('/panel/cartas/' + c.id, { method: 'DELETE' }); aviso('Carta borrada'); await cargaCartas(); ir('cartas'); }
+  catch (err) { aviso(err.message, true); }
+}
+
+// ------------------------------------------------------------ vista: mi tienda
+const COLORES = ['#e0a84e', '#e5484d', '#f76b15', '#3e9b4f', '#12a594', '#0090ff', '#8e4ec6', '#d6409f', '#e8e8e8'];
+const NOM_FONDO = { noche: 'Azul noche', negro: 'Negro', grafito: 'Grafito', granate: 'Granate', bosque: 'Verde bosque', morado: 'Morado' };
+
+function campo(id, etiqueta, valor, extra = '') {
+  return `<label for="t_${id}">${etiqueta}</label><input id="t_${id}" value="${esc(valor || '')}" ${extra}>`;
+}
+function area(id, etiqueta, valor) {
+  return `<label for="t_${id}">${etiqueta}</label><textarea id="t_${id}">${esc(valor || '')}</textarea>`;
+}
+function listaEd(id, valores, ph) {
+  return `<div class="lista-ed" id="${id}">${(valores || []).map(v => itemLista(v, ph)).join('')}</div><button type="button" class="mas-item" data-para="${id}" data-ph="${esc(ph)}">+ Añadir</button>`;
+}
+const itemLista = (v, ph) => `<div class="it"><input value="${esc(v)}" placeholder="${esc(ph)}"><button type="button" aria-label="Quitar">×</button></div>`;
+
+function vistaTienda() {
+  const c = CFG;
+  const disp = CARTAS.filter(x => x.disponibilidad !== 'Vendida');
+  $('#vista').innerHTML = bandaEstado() + `
+    <h1 style="margin:4px 2px 14px">Mi tienda</h1>
+    <div class="bloque">
+      <h2>Contacto</h2>
+      ${campo('instagram', 'Usuario de Instagram (sin @)', c.instagram, 'autocapitalize="none" spellcheck="false" placeholder="micuenta"')}
+      ${campo('whatsapp', 'WhatsApp (con 34 delante, sin espacios)', c.whatsapp, 'type="tel" inputmode="numeric" placeholder="34600123456"')}
+      <p class="ayuda">Si pones WhatsApp, cada carta tendrá un botón con el mensaje ya escrito. Vacío = sin WhatsApp.</p>
+      ${campo('ciudad', 'Ciudad desde la que envías', c.ciudad)}
+    </div>
+    <div class="bloque">
+      <h2>Apariencia</h2>
+      <label>Color principal</label>
+      <div class="colores" id="colores">${COLORES.map(x => `<button type="button" data-c="${x}" style="background:${x}" class="${c.color === x ? 'on' : ''}" aria-label="Color ${x}"></button>`).join('')}
+        <input type="color" id="t_color" value="${esc(c.color)}" aria-label="Otro color"></div>
+      <label for="t_fondo">Fondo</label>
+      <select id="t_fondo">${Object.keys(YO.fondos).map(f => `<option value="${f}"${c.fondo === f ? ' selected' : ''}>${NOM_FONDO[f] || f}</option>`).join('')}</select>
+      <label>Logo</label>
+      <div style="display:flex;gap:10px;align-items:center">
+        <div id="logoPrev" style="flex:1;min-height:52px;border:1px dashed var(--lin);border-radius:11px;display:flex;align-items:center;justify-content:center;padding:8px;color:var(--tx2);font-size:13px">${c.logo ? `<img src="${urlImg(c.logo)}" style="max-height:44px;max-width:100%">` : 'Sin logo: se usa el nombre'}</div>
+        <button type="button" class="btn sec" style="width:auto" id="bLogo">Cambiar</button>
+        ${c.logo ? '<button type="button" class="btn peligro" style="width:auto" id="bQuitaLogo">Quitar</button>' : ''}
+      </div>
+      <label for="t_columnas">Cartas por fila en ordenador</label>
+      <select id="t_columnas">${[2, 3, 4, 5, 6].map(n => `<option${+c.columnas === n ? ' selected' : ''}>${n}</option>`).join('')}</select>
+    </div>
+    <div class="bloque">
+      <h2>Portada</h2>
+      ${campo('aviso', 'Banda superior', c.aviso)}
+      ${campo('badge', 'Etiqueta pequeña', c.badge)}
+      ${campo('titulo', 'Titular', c.titulo)}
+      ${area('intro', 'Texto de entrada', c.intro)}
+      <div class="grid2">${campo('boton1', 'Botón principal', c.boton1)}${campo('boton2', 'Botón secundario', c.boton2)}</div>
+      ${campo('dato1_pie', 'Pie bajo tu @Instagram', c.dato1_pie)}
+      <div class="grid2">${campo('dato2', 'Dato 2', c.dato2, 'placeholder="+125"')}${campo('dato2_pie', 'Pie dato 2', c.dato2_pie, 'placeholder="envíos realizados"')}</div>
+      <div class="grid2">${campo('dato3', 'Dato 3', c.dato3, 'placeholder="+5 años"')}${campo('dato3_pie', 'Pie dato 3', c.dato3_pie, 'placeholder="coleccionando"')}</div>
+      ${campo('destacada_titulo', 'Título de la carta que gira', c.destacada_titulo)}
+      <label for="t_destacada">Carta que gira en la portada</label>
+      <select id="t_destacada"><option value="">Automática (la primera disponible con foto)</option>${disp.map(x => `<option value="${x.id}"${c.destacada_carta === x.id ? ' selected' : ''}>${esc(x.ref + ' · ' + x.nombre)}</option>`).join('')}</select>
+    </div>
+    <div class="bloque">
+      <h2>Apartados del escaparate</h2>
+      <p class="ayuda">Nombre, orden (1 = primero) y si se ven. Un apartado sin cartas no aparece.</p>
+      ${YO.apartados.map(k => { const a = c.apartados[k]; return `<div class="ap-ed" data-ap="${k}"><input value="${esc(a.nombre)}" aria-label="Nombre"><input type="number" min="1" max="9" value="${a.orden}" aria-label="Orden"><input type="checkbox" ${a.visible ? 'checked' : ''} aria-label="Visible"></div>`; }).join('')}
+    </div>
+    <div class="bloque">
+      <h2>Garantías y envío</h2>
+      <label>Frases de la banda de garantías</label>
+      ${listaEd('l_garantias', c.garantias, 'Ej: Envíos con seguimiento')}
+      ${campo('envio_texto', 'Envío (ficha de la carta)', c.envio_texto)}
+      ${campo('pago_texto', 'Pago (ficha de la carta)', c.pago_texto)}
+      ${campo('escaparate_nota', 'Nota encima del escaparate (opcional)', c.escaparate_nota)}
+    </div>
+    <div class="bloque">
+      <h2>Cómo comprar</h2>
+      ${campo('como_titulo', 'Título', c.como_titulo)}
+      ${campo('como_texto', 'Texto', c.como_texto)}
+      <div id="pasos">${(c.pasos || []).map((p, i) => `<div class="paso-ed" style="margin-top:10px;border-top:1px solid var(--lin);padding-top:6px"><label>Paso ${i + 1}</label><input value="${esc(p.titulo)}" placeholder="Título"><textarea style="margin-top:6px;min-height:60px" placeholder="Explicación">${esc(p.texto)}</textarea></div>`).join('')}</div>
+    </div>
+    <div class="bloque">
+      <h2>Compro colecciones</h2>
+      <div class="interruptor"><span>Mostrar esta sección</span><input type="checkbox" id="t_compro_visible" ${c.compro_visible ? 'checked' : ''}></div>
+      ${campo('compro_titulo', 'Título', c.compro_titulo)}
+      ${area('compro_texto', 'Texto', c.compro_texto)}
+      <label>Qué compras (etiquetas)</label>
+      ${listaEd('l_compro', c.compro_lista, 'Ej: Pokémon vintage')}
+    </div>
+    <div class="guardar-fijo"><button class="btn" id="bGuardaTienda" type="button">Guardar cambios</button></div>`;
+
+  document.querySelectorAll('#colores button').forEach(b => b.onclick = () => {
+    document.querySelectorAll('#colores button').forEach(x => x.classList.toggle('on', x === b));
+    $('#t_color').value = b.dataset.c;
+  });
+  $('#t_color').oninput = () => document.querySelectorAll('#colores button').forEach(x => x.classList.remove('on'));
+  document.querySelectorAll('.mas-item').forEach(b => b.onclick = () => {
+    $('#' + b.dataset.para).insertAdjacentHTML('beforeend', itemLista('', b.dataset.ph));
+    enganchaQuitar(); $('#' + b.dataset.para).lastElementChild.querySelector('input').focus();
+  });
+  enganchaQuitar();
+  $('#bLogo').onclick = () => $('#inLogo').click();
+  if ($('#bQuitaLogo')) $('#bQuitaLogo').onclick = () => guardaTienda({ logo: null });
+  $('#bGuardaTienda').onclick = () => guardaTienda();
+}
+function enganchaQuitar() {
+  document.querySelectorAll('.lista-ed .it button').forEach(b => b.onclick = () => b.parentElement.remove());
+}
+const valoresLista = id => Array.from(document.querySelectorAll(`#${id} input`)).map(i => i.value.trim()).filter(Boolean);
+
+$('#inLogo').addEventListener('change', async e => {
+  const f = e.target.files[0]; e.target.value = '';
+  if (!f) return;
+  try { aviso('Subiendo logo…'); const clave = await subeFoto(f, 800); await guardaTienda({ logo: clave }); }
+  catch (err) { aviso(err.message, true); }
+});
+
+async function guardaTienda(solo) {
+  let datos = solo;
+  if (!datos) {
+    datos = {};
+    ['instagram', 'whatsapp', 'ciudad', 'aviso', 'badge', 'titulo', 'intro', 'boton1', 'boton2', 'dato1_pie', 'dato2', 'dato2_pie', 'dato3', 'dato3_pie',
+      'destacada_titulo', 'envio_texto', 'pago_texto', 'escaparate_nota', 'como_titulo', 'como_texto', 'compro_titulo', 'compro_texto']
+      .forEach(k => { const el = $('#t_' + k); if (el) datos[k] = el.value.trim(); });
+    datos.color = $('#t_color').value;
+    datos.fondo = $('#t_fondo').value;
+    datos.columnas = $('#t_columnas').value;
+    datos.destacada_carta = $('#t_destacada').value || null;
+    datos.compro_visible = $('#t_compro_visible').checked;
+    datos.garantias = valoresLista('l_garantias');
+    datos.compro_lista = valoresLista('l_compro');
+    datos.pasos = Array.from(document.querySelectorAll('.paso-ed')).map(p => ({ titulo: p.querySelector('input').value.trim(), texto: p.querySelector('textarea').value.trim() }));
+    datos.apartados = {};
+    document.querySelectorAll('.ap-ed').forEach(r => {
+      const [n, o, v] = r.querySelectorAll('input');
+      datos.apartados[r.dataset.ap] = { nombre: n.value.trim(), orden: o.value, visible: v.checked };
+    });
+  }
+  const b = $('#bGuardaTienda'); if (b) b.disabled = true;
+  try {
+    const r = await api('/panel/tienda', { method: 'PUT', body: datos });
+    CFG = YO.vendedor.config = r.config;
+    document.documentElement.style.setProperty('--ac', CFG.color);
+    aviso('Tienda actualizada');
+    if (solo) vistaTienda();
+  } catch (err) { aviso(err.message, true); }
+  if (b) b.disabled = false;
+}
+
+// ------------------------------------------------------------ vista: cuenta
+function vistaCuenta() {
+  $('#vista').innerHTML = bandaEstado() + `
+    <h1 style="margin:4px 2px 14px">Cuenta</h1>
+    <div class="bloque">
+      <p style="margin:0">Usuario: <b>${esc(YO.usuario)}</b></p>
+      ${YO.vendedor.dominio ? `<p style="margin:8px 0 0">Tu web: <a href="https://${esc(YO.vendedor.dominio)}/" target="_blank" rel="noopener">${esc(YO.vendedor.dominio)}</a></p>
+      <p class="ayuda" style="margin-top:8px">Para entrar al panel desde el móvil: <b>${esc(YO.vendedor.dominio)}/panel</b>. Truco: ábrelo y elige «Añadir a pantalla de inicio».</p>` : ''}
+    </div>
+    ${YO.rol === 'super' ? '' : `<form class="bloque" id="fClave">
+      <h2>Cambiar contraseña</h2>
+      <label for="cActual">Contraseña actual</label><input id="cActual" type="password" autocomplete="current-password" required>
+      <label for="cNueva">Contraseña nueva (mínimo 8)</label><input id="cNueva" type="password" autocomplete="new-password" minlength="8" required>
+      <div style="height:14px"></div><button class="btn" type="submit">Cambiar contraseña</button>
+    </form>`}
+    <div class="acciones"><button class="btn sec" id="bSalir" type="button">Cerrar sesión</button></div>`;
+  const f = $('#fClave');
+  if (f) f.addEventListener('submit', async e => {
+    e.preventDefault();
+    try { await api('/clave', { method: 'PUT', body: { actual: $('#cActual').value, nueva: $('#cNueva').value } }); aviso('Contraseña cambiada'); f.reset(); }
+    catch (err) { aviso(err.message, true); }
+  });
+  $('#bSalir').onclick = async () => { await api('/logout', { method: 'POST' }).catch(() => {}); location.hash = ''; muestraLogin(); };
+}
+
+arranca();
+</script>
+</body>
+</html>

@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Superpanel · Tiendas TCG</title>
+<style>
+  :root{--ac:#e0a84e;--fo:#0a1424;--sup:#111d31;--sup2:#16253d;--lin:rgba(244,236,224,.1);--tx:#f4ece0;--tx2:#9aa8bd;--ok:#7dd6a0;--res:#e8c07a;--mal:#ef7d6d}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--fo);color:var(--tx);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  button,input,select,textarea{font:inherit;color:inherit}
+  a{color:var(--ac)}
+  .oculto{display:none!important}
+  main{max-width:980px;margin:0 auto;padding:20px 16px 60px}
+  h1{font-size:24px;margin:0}
+  h2{font-size:18px;margin:0 0 12px}
+  .cab{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+  .caja{background:var(--sup);border:1px solid var(--lin);border-radius:16px;padding:18px;margin-bottom:14px}
+  label{display:block;font-size:13px;font-weight:600;color:var(--tx2);margin:12px 0 5px}
+  input,select,textarea{width:100%;background:var(--fo);border:1px solid var(--lin);border-radius:10px;padding:11px 12px;font-size:15px;outline:none}
+  input:focus,select:focus,textarea:focus{border-color:var(--ac)}
+  .g{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:0 12px}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:none;border-radius:10px;padding:11px 16px;font-weight:700;background:var(--ac);color:var(--fo);cursor:pointer;text-decoration:none}
+  .btn.sec{background:var(--sup2);color:var(--tx);border:1px solid var(--lin)}
+  .btn.peq{padding:7px 11px;font-size:13px}
+  .btn.mal{background:none;color:var(--mal);border:1px solid rgba(239,125,109,.45)}
+  .btn:disabled{opacity:.5}
+  .msg{color:var(--mal);margin-top:10px;min-height:1em;font-size:14px}
+  .vend{border:1px solid var(--lin);border-radius:14px;padding:14px;margin-bottom:10px;background:var(--sup)}
+  .vend .top{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .vend .nom{font-weight:800;font-size:17px}
+  .est{font-size:12px;font-weight:800;padding:3px 9px;border-radius:100px}
+  .est.activo{background:var(--ok);color:#0a1424}.est.pausado{background:var(--res);color:#0a1424}.est.baja{background:#3a4559;color:#e6ebf3}
+  .det{color:var(--tx2);font-size:13.5px;margin:6px 0 10px}
+  .acc{display:flex;flex-wrap:wrap;gap:6px}
+  .dom{display:flex;flex-wrap:wrap;gap:6px;align-items:center;background:var(--fo);border:1px solid var(--lin);border-radius:10px;padding:9px 10px;margin:8px 0;font-size:14px}
+  .dom b{margin-right:auto}
+  .ok{color:var(--ok)}.pend{color:var(--res)}
+  pre.copiar{white-space:pre-wrap;background:var(--fo);border:1px solid var(--lin);border-radius:10px;padding:12px;font:13.5px/1.5 ui-monospace,monospace;margin:10px 0}
+  .ns{font:14px ui-monospace,monospace;background:var(--fo);border:1px solid var(--lin);border-radius:8px;padding:8px 10px;margin:4px 0}
+  dialog{background:var(--sup);color:var(--tx);border:1px solid var(--lin);border-radius:16px;max-width:560px;width:calc(100% - 32px);padding:20px}
+  dialog::backdrop{background:rgba(0,0,0,.6)}
+</style>
+</head>
+<body>
+<main>
+  <section id="login" class="oculto">
+    <form class="caja" id="fLogin" style="max-width:380px;margin:12vh auto">
+      <h1 style="margin-bottom:6px">Superpanel</h1>
+      <p style="color:var(--tx2);margin:0 0 6px">Usuario <b>admin</b> y la contraseña SUPER_CLAVE.</p>
+      <label for="lU">Usuario</label><input id="lU" value="admin" autocomplete="username">
+      <label for="lC">Contraseña</label><input id="lC" type="password" autocomplete="current-password">
+      <div style="height:14px"></div><button class="btn" style="width:100%">Entrar</button>
+      <div class="msg" id="lMsg"></div>
+    </form>
+  </section>
+
+  <section id="app" class="oculto">
+    <div class="cab">
+      <h1>Tiendas TCG · Superpanel</h1>
+      <div class="acc"><button class="btn" id="bNuevo">+ Alta de vendedor</button><button class="btn sec" id="bSalir">Salir</button></div>
+    </div>
+    <div id="resumen" style="color:var(--tx2);margin:-6px 0 14px"></div>
+    <div id="lista"></div>
+  </section>
+</main>
+
+<dialog id="dAlta">
+  <form id="fAlta" method="dialog">
+    <h2>Alta de vendedor</h2>
+    <div class="g">
+      <div><label for="aNombre">Nombre de la tienda *</label><input id="aNombre" required placeholder="Cartas Pepe"></div>
+      <div><label for="aId">Identificador *</label><input id="aId" required pattern="[a-z0-9][a-z0-9-]{1,30}[a-z0-9]" placeholder="cartaspepe"></div>
+      <div><label for="aDominio">Dominio</label><input id="aDominio" placeholder="cartaspepe.es"></div>
+      <div><label for="aIg">Instagram</label><input id="aIg" placeholder="@cartaspepe"></div>
+      <div><label for="aWa">WhatsApp</label><input id="aWa" placeholder="34600123456"></div>
+      <div><label for="aCiudad">Ciudad</label><input id="aCiudad" placeholder="Valencia"></div>
+      <div><label for="aColor">Color</label><input id="aColor" type="color" value="#e0a84e" style="height:44px;padding:4px"></div>
+      <div><label for="aFondo">Fondo</label><select id="aFondo"><option value="noche">Azul noche</option><option value="negro">Negro</option><option value="grafito">Grafito</option><option value="granate">Granate</option><option value="bosque">Verde bosque</option><option value="morado">Morado</option></select></div>
+      <div><label for="aPref">Prefijo de referencias</label><input id="aPref" maxlength="4" placeholder="CP"></div>
+      <div><label for="aUsuario">Usuario del panel</label><input id="aUsuario" placeholder="(igual que el identificador)"></div>
+    </div>
+    <label for="aNotas">Notas internas (precio, fecha de cobro…)</label><textarea id="aNotas" rows="2"></textarea>
+    <div class="msg" id="aMsg"></div>
+    <div class="acc" style="margin-top:12px"><button class="btn" id="bCrear" value="crear">Crear vendedor</button><button class="btn sec" value="cancel" formnovalidate>Cancelar</button></div>
+  </form>
+</dialog>
+
+<dialog id="dInfo"><div id="infoCont"></div><div class="acc" style="margin-top:12px"><button class="btn sec" onclick="this.closest('dialog').close()">Cerrar</button></div></dialog>
+
+<script>
+'use strict';
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+async function api(ruta, o = {}) {
+  const op = { method: 'GET', credentials: 'same-origin', ...o, headers: {} };
+  if (o.body) { op.body = JSON.stringify(o.body); op.headers['content-type'] = 'application/json'; }
+  const r = await fetch('/api' + ruta, op);
+  const j = await r.json().catch(() => ({}));
+  if (r.status === 401 && ruta !== '/login') { verLogin(); throw new Error('Sesión caducada'); }
+  if (!r.ok) throw new Error(j.error || 'Error ' + r.status);
+  return j;
+}
+const slug = s => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '').slice(0, 32);
+function info(html) { $('#infoCont').innerHTML = html; $('#dInfo').showModal(); }
+function copiable(txt) {
+  return `<pre class="copiar">${esc(txt)}</pre><button class="btn peq" type="button" onclick="navigator.clipboard.writeText(this.previousElementSibling.textContent).then(()=>this.textContent='Copiado ✓')">Copiar mensaje</button>`;
+}
+
+let HOST = location.host;
+function verLogin() { $('#app').classList.add('oculto'); $('#login').classList.remove('oculto'); }
+async function arranca() {
+  try { const yo = await api('/yo'); if (yo.rol !== 'super') throw 0; }
+  catch (e) { return verLogin(); }
+  $('#login').classList.add('oculto'); $('#app').classList.remove('oculto');
+  carga();
+}
+$('#fLogin').addEventListener('submit', async e => {
+  e.preventDefault(); $('#lMsg').textContent = '';
+  try { await api('/login', { method: 'POST', body: { usuario: $('#lU').value, clave: $('#lC').value } }); $('#lC').value = ''; arranca(); }
+  catch (err) { $('#lMsg').textContent = err.message; }
+});
+$('#bSalir').onclick = async () => { await api('/logout', { method: 'POST' }).catch(() => {}); verLogin(); };
+
+async function carga() {
+  const { vendedores, host_plataforma } = await api('/super/vendedores');
+  HOST = host_plataforma || location.host;
+  const n = e => vendedores.filter(v => v.estado === e).length;
+  $('#resumen').textContent = `${vendedores.length} vendedores · ${n('activo')} activos · ${n('pausado')} en pausa · ${n('baja')} de baja`;
+  $('#lista').innerHTML = vendedores.length ? vendedores.map(tarjeta).join('') : '<p style="color:var(--tx2)">Aún no hay vendedores. Pulsa «Alta de vendedor».</p>';
+  document.querySelectorAll('[data-acc]').forEach(b => b.addEventListener('click', () => accion(b.dataset.acc, b.dataset.id, b.dataset.host)));
+}
+
+function tarjeta(v) {
+  const raiz = v.dominios.filter(d => !d.host.startsWith('www.'));
+  return `<div class="vend">
+    <div class="top"><span class="nom">${esc(v.nombre)}</span><span class="est ${v.estado}">${v.estado}</span>
+      <span style="color:var(--tx2);font-size:13px;margin-left:auto">${esc(v.id)} · usuario <b>${esc(v.usuario || '—')}</b> · ${v.n_cartas} cartas</span></div>
+    ${v.notas ? `<div class="det">📝 ${esc(v.notas)}</div>` : '<div class="det"></div>'}
+    ${raiz.map(d => `<div class="dom"><b>${esc(d.host)}</b>
+      ${d.estado === 'activo' ? '<span class="ok">● Conectado</span>' : `<span class="pend">● Pendiente</span>
+        <button class="btn peq sec" data-acc="preparar" data-host="${esc(d.host)}">1 · Preparar</button>
+        <button class="btn peq sec" data-acc="comprobar" data-host="${esc(d.host)}">2 · Comprobar y conectar</button>`}
+      <button class="btn peq mal" data-acc="quitarDom" data-host="${esc(d.host)}">Quitar</button></div>`).join('')}
+    <div class="acc" style="margin-top:8px">
+      <a class="btn peq sec" href="/t/${esc(v.id)}/" target="_blank" rel="noopener">Ver tienda</a>
+      <a class="btn peq sec" href="/panel/?v=${esc(v.id)}" target="_blank" rel="noopener">Entrar a su panel</a>
+      <button class="btn peq sec" data-acc="clave" data-id="${esc(v.id)}">Nueva contraseña</button>
+      ${raiz.length ? '' : `<button class="btn peq sec" data-acc="dominio" data-id="${esc(v.id)}">Añadir dominio</button>`}
+      <button class="btn peq sec" data-acc="notas" data-id="${esc(v.id)}">Notas</button>
+      ${v.estado === 'activo' ? `<button class="btn peq mal" data-acc="pausar" data-id="${esc(v.id)}">Pausar (impago)</button>` : `<button class="btn peq" data-acc="activar" data-id="${esc(v.id)}">Reactivar</button>`}
+      ${v.estado !== 'baja' ? `<button class="btn peq mal" data-acc="baja" data-id="${esc(v.id)}">Dar de baja</button>` : `<button class="btn peq mal" data-acc="borrar" data-id="${esc(v.id)}">Borrar todo</button>`}
+    </div></div>`;
+}
+
+async function accion(a, id, host) {
+  try {
+    if (a === 'pausar' && confirm(`¿Pausar ${id}? Su web mostrará «tienda en pausa» y no podrá editar.`)) await api(`/super/vendedores/${id}/estado`, { method: 'POST', body: { estado: 'pausado' } });
+    if (a === 'activar') await api(`/super/vendedores/${id}/estado`, { method: 'POST', body: { estado: 'activo' } });
+    if (a === 'baja' && confirm(`¿Dar de baja a ${id}? Su web dejará de funcionar. Los datos se conservan hasta que pulses «Borrar todo».`)) await api(`/super/vendedores/${id}/estado`, { method: 'POST', body: { estado: 'baja' } });
+    if (a === 'borrar') {
+      const c = prompt(`Esto BORRA para siempre cartas, fotos y dominio de «${id}».\nEscribe ${id} para confirmar:`);
+      if (c) { await api(`/super/vendedores/${id}`, { method: 'DELETE', body: { confirmar: c } }); }
+    }
+    if (a === 'clave' && confirm(`¿Generar contraseña nueva para ${id}? La anterior dejará de funcionar.`)) {
+      const r = await api(`/super/vendedores/${id}/clave`, { method: 'POST' });
+      info(`<h2>Contraseña nueva</h2>${copiable(`Usuario: ${r.usuario}\nContraseña: ${r.clave}`)}`);
+    }
+    if (a === 'notas') {
+      const t = prompt('Notas internas:'); if (t !== null) await api(`/super/vendedores/${id}/notas`, { method: 'PUT', body: { notas: t } });
+    }
+    if (a === 'dominio') {
+      const d = prompt('Dominio (ej. cartaspepe.es):'); if (d) await api(`/super/vendedores/${id}/dominio`, { method: 'POST', body: { dominio: d } });
+    }
+    if (a === 'preparar') {
+      const r = await api(`/super/dominios/${host}/preparar`, { method: 'POST' });
+      info(`<h2>${esc(host)} · Paso 1</h2>
+        <p>Entra en el sitio donde compraste el dominio (Hostinger, etc.), busca <b>Servidores DNS / Nameservers</b>, elige «personalizados» y pon estos dos:</p>
+        ${r.nameservers.map(n => `<div class="ns">${esc(n)}</div>`).join('')}
+        <p style="color:var(--tx2)">Estado en Cloudflare: <b>${esc(r.estado)}</b>. El cambio tarda desde minutos hasta 24 h. Después pulsa «2 · Comprobar y conectar».</p>`);
+    }
+    if (a === 'comprobar') {
+      const r = await api(`/super/dominios/${host}/comprobar`, { method: 'POST' });
+      if (r.conectado) info(`<h2>✅ ${esc(host)} conectado</h2><p>La web ya funciona en <a href="https://${esc(host)}/" target="_blank">https://${esc(host)}</a> (el certificado HTTPS puede tardar unos minutos).</p>`);
+      else info(`<h2>Todavía no</h2><p>Cloudflare aún ve el dominio como <b>${esc(r.estado)}</b>. Revisa que los servidores DNS sean:</p>${r.nameservers.map(n => `<div class="ns">${esc(n)}</div>`).join('')}<p style="color:var(--tx2)">Vuelve a comprobar en un rato.</p>`);
+    }
+    if (a === 'quitarDom' && confirm(`¿Quitar el dominio ${host} de este vendedor?`)) await api(`/super/dominios/${host}/quitar`, { method: 'POST' });
+    await carga();
+  } catch (err) { alert(err.message); }
+}
+
+// Alta
+$('#bNuevo').onclick = () => { $('#fAlta').reset(); $('#aMsg').textContent = ''; $('#dAlta').showModal(); };
+$('#aNombre').addEventListener('input', () => { if (!$('#aId').dataset.tocado) $('#aId').value = slug($('#aNombre').value); });
+$('#aId').addEventListener('input', () => { $('#aId').dataset.tocado = '1'; });
+$('#fAlta').addEventListener('submit', async e => {
+  if (e.submitter && e.submitter.value === 'cancel') return;
+  e.preventDefault();
+  const b = $('#bCrear'); b.disabled = true; $('#aMsg').textContent = '';
+  try {
+    const r = await api('/super/vendedores', { method: 'POST', body: {
+      nombre: $('#aNombre').value, id: $('#aId').value, dominio: $('#aDominio').value, instagram: $('#aIg').value,
+      whatsapp: $('#aWa').value, ciudad: $('#aCiudad').value, color: $('#aColor').value, fondo: $('#aFondo').value,
+      prefijo: $('#aPref').value, usuario: $('#aUsuario').value, notas: $('#aNotas').value } });
+    $('#dAlta').close();
+    const panel = r.dominio ? `https://${r.dominio}/panel` : `https://${HOST}/panel/`;
+    const web = r.dominio ? `https://${r.dominio}` : r.vista_previa;
+    info(`<h2>✅ ${esc($('#aNombre').value)} creado</h2>
+      <p>Mensaje listo para enviarle por WhatsApp (la contraseña solo se muestra ahora):</p>
+      ${copiable(`¡Hola! Tu web ya está creada 🎉\n\nTu web: ${web}${r.dominio ? '\n(mientras se activa tu dominio, puedes verla aquí: ' + r.vista_previa + ')' : ''}\n\nPanel para subir tus cartas: ${panel}${r.dominio ? '\n(mientras se activa tu dominio, entra por: https://' + HOST + '/panel/)' : ''}\nUsuario: ${r.usuario}\nContraseña: ${r.clave}\n\nConsejo: abre el panel en el móvil y pulsa «Añadir a pantalla de inicio». Desde ahí haces la foto de la carta y la publicas en un minuto.\nPuedes cambiar la contraseña en «Cuenta».`)}
+      ${r.dominio ? `<p style="margin-top:14px">Siguiente: en la tarjeta del vendedor pulsa <b>«1 · Preparar»</b> junto a ${esc(r.dominio)} para conectar el dominio.</p>` : ''}`);
+    carga();
+  } catch (err) { $('#aMsg').textContent = err.message; }
+  b.disabled = false;
+});
+
+arranca();
+</script>
+</body>
+</html>
