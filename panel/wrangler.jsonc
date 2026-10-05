@@ -1,0 +1,18 @@
+{
+  // Worker del PANEL PRIVADO (separado de la web pública).
+  // Sirve la app desde ./public y maneja /api/* con base de datos D1.
+  "name": "mistercard-panel",
+  "main": "src/index.js",
+  "compatibility_date": "2026-09-19",
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "mistercard_panel",
+      "database_id": "d1293445-53c9-432c-aaff-385ffce687d2"
+    }
+  ]
+}
