@@ -1,3 +1,6 @@
 # Archivos que NO se publican en mistercard.es
+panel/
 plataforma/
-.git
+**/.git
+**/node_modules
+**/.DS_Store
