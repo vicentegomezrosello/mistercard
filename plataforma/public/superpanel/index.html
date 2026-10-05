@@ -81,6 +81,7 @@
       <div><label for="aPref">Prefijo de referencias</label><input id="aPref" maxlength="4" placeholder="CP"></div>
       <div><label for="aUsuario">Usuario del panel</label><input id="aUsuario" placeholder="(igual que el identificador)"></div>
     </div>
+    <label style="display:flex;gap:9px;align-items:center;margin-top:14px;color:var(--tx)"><input type="checkbox" id="aPremium" style="width:20px;height:20px;accent-color:var(--ac)"> Incluir calculadora premium</label>
     <label for="aNotas">Notas internas (precio, fecha de cobro…)</label><textarea id="aNotas" rows="2"></textarea>
     <div class="msg" id="aMsg"></div>
     <div class="acc" style="margin-top:12px"><button class="btn" id="bCrear" value="crear">Crear vendedor</button><button class="btn sec" value="cancel" formnovalidate>Cancelar</button></div>
@@ -136,6 +137,7 @@ function tarjeta(v) {
   const raiz = v.dominios.filter(d => !d.host.startsWith('www.'));
   return `<div class="vend">
     <div class="top"><span class="nom">${esc(v.nombre)}</span><span class="est ${v.estado}">${v.estado}</span>
+      ${v.premium ? '<span class="est" style="background:var(--ac);color:#0a1424">Premium</span>' : ''}
       <span style="color:var(--tx2);font-size:13px;margin-left:auto">${esc(v.id)} · usuario <b>${esc(v.usuario || '—')}</b> · ${v.n_cartas} cartas</span></div>
     ${v.notas ? `<div class="det">📝 ${esc(v.notas)}</div>` : '<div class="det"></div>'}
     ${raiz.map(d => `<div class="dom"><b>${esc(d.host)}</b>
@@ -149,6 +151,7 @@ function tarjeta(v) {
       <button class="btn peq sec" data-acc="clave" data-id="${esc(v.id)}">Nueva contraseña</button>
       ${raiz.length ? '' : `<button class="btn peq sec" data-acc="dominio" data-id="${esc(v.id)}">Añadir dominio</button>`}
       <button class="btn peq sec" data-acc="notas" data-id="${esc(v.id)}">Notas</button>
+      <button class="btn peq sec" data-acc="${v.premium ? 'premiumOff' : 'premiumOn'}" data-id="${esc(v.id)}">${v.premium ? 'Quitar calculadora premium' : 'Activar calculadora premium'}</button>
       ${v.estado === 'activo' ? `<button class="btn peq mal" data-acc="pausar" data-id="${esc(v.id)}">Pausar (impago)</button>` : `<button class="btn peq" data-acc="activar" data-id="${esc(v.id)}">Reactivar</button>`}
       ${v.estado !== 'baja' ? `<button class="btn peq mal" data-acc="baja" data-id="${esc(v.id)}">Dar de baja</button>` : `<button class="btn peq mal" data-acc="borrar" data-id="${esc(v.id)}">Borrar todo</button>`}
     </div></div>`;
@@ -167,6 +170,8 @@ async function accion(a, id, host) {
       const r = await api(`/super/vendedores/${id}/clave`, { method: 'POST' });
       info(`<h2>Contraseña nueva</h2>${copiable(`Usuario: ${r.usuario}\nContraseña: ${r.clave}`)}`);
     }
+    if (a === 'premiumOn') await api(`/super/vendedores/${id}/premium`, { method: 'POST', body: { activo: true } });
+    if (a === 'premiumOff' && confirm(`¿Quitar la calculadora premium a ${id}? Sus datos se conservan y vuelven si la reactivas.`)) await api(`/super/vendedores/${id}/premium`, { method: 'POST', body: { activo: false } });
     if (a === 'notas') {
       const t = prompt('Notas internas:'); if (t !== null) await api(`/super/vendedores/${id}/notas`, { method: 'PUT', body: { notas: t } });
     }
@@ -202,7 +207,7 @@ $('#fAlta').addEventListener('submit', async e => {
     const r = await api('/super/vendedores', { method: 'POST', body: {
       nombre: $('#aNombre').value, id: $('#aId').value, dominio: $('#aDominio').value, instagram: $('#aIg').value,
       whatsapp: $('#aWa').value, ciudad: $('#aCiudad').value, color: $('#aColor').value, fondo: $('#aFondo').value,
-      prefijo: $('#aPref').value, usuario: $('#aUsuario').value, notas: $('#aNotas').value } });
+      prefijo: $('#aPref').value, usuario: $('#aUsuario').value, notas: $('#aNotas').value, premium: $('#aPremium').checked } });
     $('#dAlta').close();
     const panel = r.dominio ? `https://${r.dominio}/panel` : `https://${HOST}/panel/`;
     const web = r.dominio ? `https://${r.dominio}` : r.vista_previa;

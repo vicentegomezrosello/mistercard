@@ -10,6 +10,7 @@ import {
   APARTADOS, DISPONIBILIDAD, JUEGOS, FONDOS, configPorDefecto, CAMPOS_EDITABLES,
   cssTema, datosPublicos
 } from './tienda.js';
+import { apiPremium } from './premium.js';
 import { dominioRaiz, preparaZona, compruebaZona, conectaHost, desconectaHost } from './cloudflare.js';
 
 const DIAS_SESION = 30;
@@ -46,6 +47,7 @@ async function enruta(req, env, ctx) {
 
   // Paneles (archivos estáticos). El superpanel solo existe en el dominio de la plataforma.
   if (ruta === '/panel') return Response.redirect(url.origin + '/panel/', 302);
+  if (ruta === '/panel/premium' || ruta === '/panel/premium/') return env.ASSETS.fetch(new Request(url.origin + '/panel/premium.html'));
   if (ruta.startsWith('/panel/')) return env.ASSETS.fetch(new Request(url.origin + '/panel/index.html'));
   if (ruta.startsWith('/superpanel')) {
     if (!plataforma) return noEncontrado();
@@ -207,6 +209,15 @@ async function api(req, env, ctx, url, host, plataforma) {
   if (ruta === '/yo' && m === 'GET') return infoYo(env, yo, url);
   if (ruta === '/clave' && m === 'PUT') return cambiaClave(req, env, yo);
 
+  // Calculadora premium: solo el propio vendedor (ni el superadmin) y solo si la tiene contratada.
+  if (ruta.startsWith('/premium/')) {
+    if (yo.rol !== 'vendedor') return error('La calculadora premium es privada de cada vendedor.', 403);
+    const v = await env.DB.prepare('SELECT * FROM vendedores WHERE id = ?').bind(yo.vendedor_id).first();
+    if (!v || v.estado === 'baja') return error('Tienda no disponible', 403);
+    if (!v.premium) return error('La calculadora premium no está activada en tu plan.', 403);
+    return apiPremium(req, env, ruta.slice(8), m, url, v, yo);
+  }
+
   if (ruta.startsWith('/super/')) {
     if (yo.rol !== 'super' || !plataforma) return error('No permitido', 403);
     return apiSuper(req, env, ctx, ruta.slice(6), m, url);
@@ -290,7 +301,7 @@ async function usuarioActual(req, env) {
 
 async function infoYo(env, yo, url) {
   const vid = yo.rol === 'super' ? url.searchParams.get('v') : yo.vendedor_id;
-  const v = vid ? await env.DB.prepare('SELECT id, nombre, estado, config, prefijo_ref FROM vendedores WHERE id = ?').bind(vid).first() : null;
+  const v = vid ? await env.DB.prepare('SELECT id, nombre, estado, config, prefijo_ref, premium FROM vendedores WHERE id = ?').bind(vid).first() : null;
   let dominio = null;
   if (v) {
     const d = await env.DB.prepare("SELECT host FROM dominios WHERE vendedor_id = ? AND host NOT LIKE 'www.%' ORDER BY estado = 'activo' DESC LIMIT 1").bind(v.id).first();
@@ -298,7 +309,7 @@ async function infoYo(env, yo, url) {
   }
   return json({
     usuario: yo.usuario, rol: yo.rol,
-    vendedor: v ? { id: v.id, nombre: v.nombre, estado: v.estado, prefijo: v.prefijo_ref, config: JSON.parse(v.config), dominio } : null,
+    vendedor: v ? { id: v.id, nombre: v.nombre, estado: v.estado, prefijo: v.prefijo_ref, premium: !!v.premium, config: JSON.parse(v.config), dominio } : null,
     juegos: JUEGOS, apartados: APARTADOS, disponibilidad: DISPONIBILIDAD, fondos: FONDOS
   });
 }
@@ -473,7 +484,7 @@ async function apiPanel(req, env, ctx, ruta, m, v) {
 
 async function apiSuper(req, env, ctx, ruta, m, url) {
   if (ruta === '/vendedores' && m === 'GET') {
-    const { results } = await env.DB.prepare(`SELECT v.id, v.nombre, v.estado, v.notas, v.creado, v.actualizado,
+    const { results } = await env.DB.prepare(`SELECT v.id, v.nombre, v.estado, v.premium, v.notas, v.creado, v.actualizado,
       (SELECT COUNT(*) FROM cartas c WHERE c.vendedor_id = v.id) AS n_cartas,
       (SELECT usuario FROM usuarios u WHERE u.vendedor_id = v.id LIMIT 1) AS usuario
       FROM vendedores v ORDER BY v.creado`).all();
@@ -505,7 +516,7 @@ async function apiSuper(req, env, ctx, ruta, m, url) {
     const clave = claveLegible(10);
     const sal = aleatorio(16);
     const stmts = [
-      env.DB.prepare('INSERT INTO vendedores (id, nombre, config, prefijo_ref, notas) VALUES (?,?,?,?,?)').bind(id, nombre, JSON.stringify(cfg), prefijo, limpiaTexto(b.notas, 500)),
+      env.DB.prepare('INSERT INTO vendedores (id, nombre, config, prefijo_ref, notas, premium) VALUES (?,?,?,?,?,?)').bind(id, nombre, JSON.stringify(cfg), prefijo, limpiaTexto(b.notas, 500), b.premium ? 1 : 0),
       env.DB.prepare("INSERT INTO usuarios (id, vendedor_id, usuario, pass_hash, pass_sal, rol) VALUES (?,?,?,?,?, 'vendedor')").bind(uid(), id, usuario, await hashClave(clave, sal), sal)
     ];
     if (dominio) {
@@ -542,6 +553,11 @@ async function apiSuper(req, env, ctx, ruta, m, url) {
       await env.DB.prepare('DELETE FROM sesiones WHERE usuario_id IN (SELECT id FROM usuarios WHERE vendedor_id = ?)').bind(v.id).run();
       const u = await env.DB.prepare('SELECT usuario FROM usuarios WHERE vendedor_id = ?').bind(v.id).first();
       return json({ ok: true, usuario: u && u.usuario, clave });
+    }
+    if (accion === '/premium' && m === 'POST') {
+      const b = await cuerpo(req);
+      await env.DB.prepare('UPDATE vendedores SET premium = ? WHERE id = ?').bind(b.activo ? 1 : 0, v.id).run();
+      return json({ ok: true });
     }
     if (accion === '/notas' && m === 'PUT') {
       const b = await cuerpo(req);

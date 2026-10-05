@@ -34,7 +34,7 @@
   header .nom{font-weight:800;font-size:16px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   header a{font-size:13px;font-weight:700;white-space:nowrap}
   main{padding:14px 14px 110px;max-width:760px;margin:0 auto}
-  nav.abajo{position:fixed;left:0;right:0;bottom:0;z-index:10;display:grid;grid-template-columns:repeat(4,1fr);background:rgba(13,23,40,.97);border-top:1px solid var(--lin);padding-bottom:env(safe-area-inset-bottom)}
+  nav.abajo{position:fixed;left:0;right:0;bottom:0;z-index:10;display:grid;grid-auto-flow:column;grid-auto-columns:1fr;background:rgba(13,23,40,.97);border-top:1px solid var(--lin);padding-bottom:env(safe-area-inset-bottom)}
   nav.abajo button{background:none;border:none;padding:9px 4px 10px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:600;color:var(--tx2);cursor:pointer}
   nav.abajo button svg{width:23px;height:23px}
   nav.abajo button.on{color:var(--ac)}
@@ -126,6 +126,7 @@
   <nav class="abajo" aria-label="Secciones">
     <button data-v="cartas" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="12" height="16" rx="2"/><path d="M8 21h10a2 2 0 0 0 2-2V7"/></svg>Cartas</button>
     <button data-v="nueva" class="mas"><span class="c"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M12 5v14M5 12h14"/></svg></span>Añadir</button>
+    <button data-v="premium" id="navPremium" class="oculto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 11h2M14 11h2M8 15h2M14 15h2M8 19h8"/></svg>Calculadora</button>
     <button data-v="tienda"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l1.5-5h15L21 9M4 9v11h16V9M3 9h18M9 20v-6h6v6"/></svg>Mi tienda</button>
     <button data-v="cuenta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></svg>Cuenta</button>
   </nav>
@@ -210,6 +211,7 @@ async function arranca() {
   const enPlataforma = /workers\.dev$|^localhost$|^127\./.test(location.hostname) || V;
   $('#hVer').href = enPlataforma ? `/t/${YO.vendedor.id}/` : '/';
   if (enPlataforma && YO.vendedor.dominio && !V) $('#hVer').href = 'https://' + YO.vendedor.dominio + '/';
+  $('#navPremium').classList.toggle('oculto', !(YO.vendedor.premium && YO.rol === 'vendedor'));
   await cargaCartas();
   ir(location.hash.slice(1) || 'cartas');
 }
@@ -234,7 +236,7 @@ async function cargaCartas() {
   CARTAS = (await api('/panel/cartas')).cartas;
 }
 
-document.querySelectorAll('nav.abajo button').forEach(b => b.addEventListener('click', () => ir(b.dataset.v)));
+document.querySelectorAll('nav.abajo button').forEach(b => b.addEventListener('click', () => b.dataset.v === 'premium' ? (location.href = '/panel/premium/') : ir(b.dataset.v)));
 window.addEventListener('hashchange', () => { const v = location.hash.slice(1); if (v && v !== vistaActual) ir(v, true); });
 
 let vistaActual = '';

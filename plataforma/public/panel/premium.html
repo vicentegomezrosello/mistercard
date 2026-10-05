@@ -1,0 +1,651 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Calculadora premium</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a1424; --panel:#0f1d33; --panel2:#0c1830; --gold:#e0a84e; --gold-soft:rgba(224,168,78,.12);
+    --gold-line:rgba(224,168,78,.34); --ink:#f4ece0; --muted:#9aa8bd; --dim:#8794ab;
+    --line:rgba(244,236,224,.09); --ok:#7dd6a0; --bad:#e58a7a; --azul:#8fd0e0;
+    --sans:'Manrope',system-ui,sans-serif; --disp:'Sora',var(--sans);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{color:var(--gold);text-decoration:none} a:hover{color:#eec078}
+  h1,h2,h3{font-family:var(--disp);letter-spacing:-.02em;margin:0}
+  ::selection{background:var(--gold);color:var(--bg)}
+  header{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:12px 18px;background:rgba(10,20,36,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+  header .volver{font-weight:700;font-size:14px;color:var(--muted)}
+  header .marca{font-family:var(--disp);font-weight:800;font-size:17px}
+  .bloqueo{max-width:460px;margin:12vh auto;text-align:center}
+  header .badge{font-family:var(--disp);font-weight:700;font-size:13px;color:var(--gold);border:1px solid var(--gold-line);background:var(--gold-soft);padding:5px 11px;border-radius:100px}
+  header .quien{margin-left:auto;font-size:12px;color:var(--dim)}
+  .wrap{max-width:1120px;margin:0 auto;padding:20px 16px 80px}
+  .tabs{display:flex;gap:7px;margin-bottom:22px;flex-wrap:wrap}
+  .tab{font-family:var(--disp);font-weight:600;font-size:13.5px;padding:10px 16px;border-radius:100px;cursor:pointer;background:var(--panel);color:var(--muted);border:1px solid var(--line);min-height:44px}
+  .tab[aria-selected=true]{background:var(--gold);color:var(--bg);border-color:var(--gold)}
+  .tab:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  .oculto{display:none}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px}
+  .card+.card{margin-top:16px}
+  .card h2{font-size:14px;font-weight:700;color:var(--gold);margin-bottom:14px;text-transform:uppercase;letter-spacing:.04em}
+  .cols{display:grid;grid-template-columns:1fr;gap:18px}
+  @media(min-width:880px){.cols{grid-template-columns:minmax(0,1fr) minmax(0,400px);align-items:start}.sticky{position:sticky;top:78px}}
+  .campo{margin-bottom:14px} .campo:last-child{margin-bottom:0}
+  label{display:block;font-size:13px;font-weight:600;margin-bottom:6px}
+  label .hint{font-weight:400;color:var(--dim);font-size:12px}
+  input,select{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:10px;color:var(--ink);font-family:var(--sans);font-size:16px;padding:11px 12px;min-height:44px;-webkit-appearance:none;appearance:none}
+  input:focus,select:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-soft)}
+  select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath fill='%239aa8bd' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;padding-right:32px}
+  .euro,.pct{position:relative}
+  .euro input{padding-right:28px} .pct input{padding-right:28px}
+  .euro::after{content:"€"} .pct::after{content:"%"}
+  .euro::after,.pct::after{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--dim);font-size:15px;pointer-events:none}
+  .fila{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+  @media(max-width:360px){.fila{grid-template-columns:1fr}}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:var(--bg);font-family:var(--disp);font-weight:700;font-size:14px;padding:12px 18px;border:none;border-radius:11px;min-height:44px;cursor:pointer;width:100%}
+  .btn:hover{background:#eec078}
+  .btn.sec{background:none;border:1px solid var(--line);color:var(--ink);font-weight:600}
+  .btn.sec:hover{border-color:var(--gold-line);color:var(--gold);background:none}
+  .btn.mini{width:auto;padding:8px 13px;font-size:12.5px;min-height:38px}
+  .linea{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:9px 0;border-top:1px solid var(--line);font-size:14px}
+  .linea:first-child{border-top:none}
+  .linea .lbl{color:var(--muted)} .linea .val{font-family:var(--disp);font-weight:700;white-space:nowrap}
+  .val.pos{color:var(--ok)} .val.neg{color:var(--bad)} .val.oro{color:var(--gold)}
+  .res-princ{background:linear-gradient(160deg,#12233d,#0c1830);border:1px solid var(--gold-line)}
+  .res-big{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+  .res-big .lbl{font-size:13px;color:var(--muted);font-weight:600}
+  .res-big .val{font-family:var(--disp);font-weight:800;font-size:25px}
+  .grid-tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  @media(min-width:620px){.grid-tiles{grid-template-columns:repeat(3,1fr)}}
+  .tile{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:15px}
+  .tile .t{font-size:11.5px;color:var(--dim);font-weight:600;text-transform:uppercase;letter-spacing:.03em;margin-bottom:7px;line-height:1.3}
+  .tile .n{font-family:var(--disp);font-weight:800;font-size:22px;line-height:1}
+  .tile .sub{font-size:11.5px;color:var(--muted);margin-top:5px}
+  .reparto{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:4px}
+  @media(max-width:420px){.reparto{grid-template-columns:1fr}}
+  .rep-item{background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:12px;text-align:center}
+  .rep-item .p{font-size:11px;color:var(--gold);font-weight:700} .rep-item .l{font-size:11.5px;color:var(--muted);margin:3px 0 6px} .rep-item .v{font-family:var(--disp);font-weight:700;font-size:16px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+  th{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.03em;font-weight:700}
+  td .del{background:none;border:none;color:var(--bad);cursor:pointer;font-size:16px;padding:2px 6px;line-height:1}
+  .tabla-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .vacio{color:var(--dim);font-size:13.5px;padding:18px 0;text-align:center}
+  .nota{font-size:12px;color:var(--dim);margin-top:10px;line-height:1.5}
+  .aviso{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(14px);background:var(--gold);color:var(--bg);font-weight:700;font-size:14px;padding:12px 18px;border-radius:12px;box-shadow:0 14px 34px rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:60}
+  .aviso.ver{opacity:1;transform:translateX(-50%) translateY(0)}
+  .lote-row{display:grid;grid-template-columns:1fr 110px 34px;gap:8px;align-items:center;margin-bottom:8px}
+  .lote-row .del{background:none;border:1px solid var(--line);color:var(--bad);border-radius:9px;min-height:44px;cursor:pointer;font-size:16px}
+  .banner{background:var(--gold-soft);border:1px solid var(--gold-line);border-radius:12px;padding:12px 14px;font-size:13px;color:#e8c07a;margin-bottom:18px;display:flex;gap:9px;align-items:flex-start}
+  .banner svg{flex:none;margin-top:1px}
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <a href="/panel/" class="volver" aria-label="Volver al panel">← Panel</a>
+  <span class="marca" id="marcaTienda"></span>
+  <span class="badge">Calculadora premium</span>
+  <span class="quien" id="quien"></span>
+</header>
+
+<div class="wrap">
+  <div class="banner" id="bannerSync" style="display:none">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4m0 4h.01M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"></path></svg>
+    <span id="bannerTxt"></span>
+  </div>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" id="t-panel" role="tab" aria-selected="true">Panel</button>
+    <button class="tab" id="t-calc" role="tab" aria-selected="false">Calcular</button>
+    <button class="tab" id="t-lotes" role="tab" aria-selected="false">Lotes</button>
+    <button class="tab" id="t-comp" role="tab" aria-selected="false">Vender vs. mantener</button>
+    <button class="tab" id="t-ajustes" role="tab" aria-selected="false">Ajustes</button>
+  </div>
+
+  <!-- ===== PANEL ===== -->
+  <section id="p-panel" role="tabpanel">
+    <div class="grid-tiles" id="tiles"></div>
+    <div class="card" style="margin-top:16px">
+      <h2>Historial de operaciones</h2>
+      <div class="tabla-scroll">
+        <table id="tabla">
+          <thead><tr><th>Fecha</th><th>Producto</th><th>Plataforma</th><th>Compra</th><th>Venta</th><th>Beneficio</th><th>ROI</th><th></th></tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+      <div class="vacio" id="vacio">Aún no has guardado operaciones. Ve a «Calcular» y pulsa «Guardar operación».</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">
+        <button class="btn sec mini" id="expCSV">Exportar CSV</button>
+        <button class="btn sec mini" id="expJSON">Exportar copia (JSON)</button>
+        <button class="btn sec mini" id="impJSON">Importar copia</button>
+        <input type="file" id="fileJSON" accept="application/json" style="display:none">
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CALCULAR ===== -->
+  <section id="p-calc" role="tabpanel" class="oculto">
+    <div class="cols">
+      <div>
+        <div class="card">
+          <h2>Operación</h2>
+          <div class="campo"><label for="nombre">Carta o producto</label><input type="text" id="nombre" placeholder="Ej: Charizard VMAX PSA 10" autocomplete="off"></div>
+          <div class="campo"><label for="plataforma">Plataforma</label><select id="plataforma"></select><div class="nota" id="platTarifa"></div></div>
+          <div class="fila">
+            <div class="campo"><label for="comManual">Comisión</label><div class="pct"><input type="number" id="comManual" inputmode="decimal" min="0" max="99.9" step="0.01"></div></div>
+            <div class="campo"><label for="fijaManual">Tarifa fija</label><div class="euro"><input type="number" id="fijaManual" inputmode="decimal" min="0" step="0.01"></div></div>
+          </div>
+          <div class="campo"><label for="compra">Coste total de compra</label><div class="euro"><input type="number" id="compra" inputmode="decimal" min="0" step="0.01" placeholder="0"></div></div>
+          <div class="campo"><label for="venta">Importe total de venta</label><div class="euro"><input type="number" id="venta" inputmode="decimal" min="0" step="0.01" placeholder="0"></div></div>
+          <div class="fila">
+            <div class="campo"><label for="envio">Envío (lo pagas tú)</label><div class="euro"><input type="number" id="envio" inputmode="decimal" min="0" step="0.01" placeholder="0"></div></div>
+            <div class="campo"><label for="embalaje">Embalaje</label><div class="euro"><input type="number" id="embalaje" inputmode="decimal" min="0" step="0.01" placeholder="0"></div></div>
+          </div>
+          <div class="fila">
+            <div class="campo"><label for="otros">Otros gastos</label><div class="euro"><input type="number" id="otros" inputmode="decimal" min="0" step="0.01" placeholder="0"></div></div>
+            <div class="campo"><label for="roiObj">ROI objetivo</label><div class="pct"><input type="number" id="roiObj" inputmode="decimal" min="0" step="1" value="50"></div></div>
+          </div>
+          <button class="btn" id="guardar" style="margin-top:6px">Guardar operación</button>
+        </div>
+      </div>
+      <div class="sticky">
+        <div class="card res-princ">
+          <div class="res-big"><span class="lbl">Beneficio real</span><span class="val" id="rBen">—</span></div>
+          <div class="linea"><span class="lbl">ROI</span><span class="val" id="rRoi">—</span></div>
+          <div class="linea"><span class="lbl">Cobro neto</span><span class="val" id="rNeto">—</span></div>
+          <div class="linea"><span class="lbl">Comisión</span><span class="val" id="rCom">—</span></div>
+          <div class="linea"><span class="lbl">Gastos</span><span class="val" id="rGas">—</span></div>
+        </div>
+        <div class="card">
+          <h2>Reparto del beneficio</h2>
+          <div class="reparto">
+            <div class="rep-item"><div class="p" id="pAhorro">30%</div><div class="l">Ahorro intocable</div><div class="v oro" id="rAhorro">—</div></div>
+            <div class="rep-item"><div class="p" id="pPersonal">20%</div><div class="l">Personal</div><div class="v" id="rPersonal">—</div></div>
+            <div class="rep-item"><div class="p" id="pReinv">50%</div><div class="l">Reinversión</div><div class="v" id="rReinv">—</div></div>
+          </div>
+          <div class="linea" style="margin-top:12px"><span class="lbl">Máximo próxima compra</span><span class="val oro" id="rMax">—</span></div>
+        </div>
+        <div class="card">
+          <h2>Objetivos de precio</h2>
+          <div class="linea"><span class="lbl">Precio mínimo sin pérdidas</span><span class="val" id="rBE">—</span></div>
+          <div class="linea"><span class="lbl" id="rTgtLbl">Precio para ROI 50%</span><span class="val" id="rTgt">—</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== LOTES ===== -->
+  <section id="p-lotes" role="tabpanel" class="oculto">
+    <div class="cols">
+      <div class="card">
+        <h2>Reparto de coste de un lote</h2>
+        <div class="campo"><label for="loteCoste">Coste total del lote</label><div class="euro"><input type="number" id="loteCoste" inputmode="decimal" min="0" step="0.01" placeholder="0"></div></div>
+        <div class="campo"><label for="loteMetodo">Método de reparto</label>
+          <select id="loteMetodo">
+            <option value="valor">Proporcional al valor de venta (recomendado)</option>
+            <option value="equit">A partes iguales</option>
+          </select>
+        </div>
+        <label>Cartas del lote <span class="hint">(nombre y precio de venta estimado)</span></label>
+        <div id="loteRows"></div>
+        <button class="btn sec mini" id="loteAdd" style="margin-top:4px">+ Añadir carta</button>
+      </div>
+      <div class="sticky">
+        <div class="card">
+          <h2>Coste asignado a cada carta</h2>
+          <div class="tabla-scroll"><table><thead><tr><th>Carta</th><th>Venta est.</th><th>Coste asignado</th></tr></thead><tbody id="loteBody"></tbody></table></div>
+          <div class="linea" style="margin-top:6px"><span class="lbl">Total repartido</span><span class="val" id="loteTotal">—</span></div>
+          <p class="nota">Te dice cuánto "cuesta" cada carta del lote para calcular su beneficio real por separado en la pestaña Calcular.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== COMPARAR ===== -->
+  <section id="p-comp" role="tabpanel" class="oculto">
+    <div class="cols">
+      <div>
+        <div class="card">
+          <h2>Situación actual</h2>
+          <div class="campo"><label for="c_compra">Coste de compra</label><div class="euro"><input type="number" id="c_compra" inputmode="decimal" min="0" step="0.01" placeholder="0"></div></div>
+          <div class="campo"><label for="c_ventaAhora">Precio de venta actual</label><div class="euro"><input type="number" id="c_ventaAhora" inputmode="decimal" min="0" step="0.01" placeholder="0"></div></div>
+          <div class="campo"><label for="c_platAhora">Plataforma ahora</label><select id="c_platAhora"></select></div>
+          <div class="campo"><label for="c_gastosAhora">Gastos de vender ahora</label><div class="euro"><input type="number" id="c_gastosAhora" inputmode="decimal" min="0" step="0.01" placeholder="0"></div></div>
+        </div>
+        <div class="card">
+          <h2>Si lo mantienes</h2>
+          <div class="campo"><label for="c_ventaFut">Precio futuro estimado</label><div class="euro"><input type="number" id="c_ventaFut" inputmode="decimal" min="0" step="0.01" placeholder="0"></div></div>
+          <div class="campo"><label for="c_platFut">Plataforma futura</label><select id="c_platFut"></select></div>
+          <div class="fila">
+            <div class="campo"><label for="c_meses">Meses</label><input type="number" id="c_meses" inputmode="numeric" min="0" step="1" placeholder="0"></div>
+            <div class="campo"><label for="c_holding">Costes por mantener</label><div class="euro"><input type="number" id="c_holding" inputmode="decimal" min="0" step="0.01" placeholder="0"></div></div>
+          </div>
+          <div class="campo"><label for="c_gastosFut">Gastos venta futura</label><div class="euro"><input type="number" id="c_gastosFut" inputmode="decimal" min="0" step="0.01" placeholder="0"></div></div>
+        </div>
+      </div>
+      <div class="sticky">
+        <div class="card"><h2>Vender ahora</h2>
+          <div class="linea"><span class="lbl">Beneficio</span><span class="val" id="cn_ben">—</span></div>
+          <div class="linea"><span class="lbl">ROI</span><span class="val" id="cn_roi">—</span></div>
+          <div class="linea"><span class="lbl">Dinero recuperado</span><span class="val" id="cn_rec">—</span></div>
+        </div>
+        <div class="card"><h2>Mantener</h2>
+          <div class="linea"><span class="lbl">Beneficio estimado</span><span class="val" id="ch_ben">—</span></div>
+          <div class="linea"><span class="lbl">ROI estimado</span><span class="val" id="ch_roi">—</span></div>
+          <div class="linea"><span class="lbl">Diferencia</span><span class="val" id="ch_dif">—</span></div>
+          <div class="card" style="margin-top:12px;background:var(--gold-soft);border-color:var(--gold-line)"><div id="veredicto" style="font-family:var(--disp);font-weight:600;font-size:14px">Introduce datos para comparar.</div></div>
+          <p class="nota">Estimación antes de impuestos, riesgo y variaciones del mercado.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== AJUSTES ===== -->
+  <section id="p-ajustes" role="tabpanel" class="oculto">
+    <div class="card">
+      <h2>Reparto del beneficio</h2>
+      <p class="nota" style="margin-top:0">Cómo se reparte cada beneficio positivo. Debe sumar 100%.</p>
+      <div class="fila" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="campo"><label for="cfgAhorro">Ahorro</label><div class="pct"><input type="number" id="cfgAhorro" inputmode="numeric" min="0" max="100" step="1"></div></div>
+        <div class="campo"><label for="cfgPersonal">Personal</label><div class="pct"><input type="number" id="cfgPersonal" inputmode="numeric" min="0" max="100" step="1"></div></div>
+        <div class="campo"><label for="cfgReinv">Reinversión</label><div class="pct"><input type="number" id="cfgReinv" inputmode="numeric" min="0" max="100" step="1"></div></div>
+      </div>
+      <div class="nota" id="cfgSuma"></div>
+      <button class="btn mini" id="cfgGuardar" style="margin-top:12px">Guardar ajustes</button>
+    </div>
+    <div class="card">
+      <h2>Datos</h2>
+      <p class="nota" style="margin-top:0">Tus operaciones se guardan en la nube, son privadas (solo las ves tú) y viajan entre tus dispositivos. Para traer datos de otra calculadora usa «Exportar copia» allí e «Importar copia» aquí. Si te quedas sin conexión, se guardan aquí y se sincronizan al volver.</p>
+      <button class="btn sec mini" id="borrarTodo" style="color:var(--bad);border-color:rgba(229,138,122,.4)">Borrar todo el historial</button>
+    </div>
+  </section>
+</div>
+
+<div class="aviso" id="aviso" role="status" aria-live="polite"></div>
+
+<script>
+// ===== Config de plataformas =====
+const platformFees = {
+  cardmarket: { label:"Cardmarket", percentage:5, fixedFee:0 },
+  ebay:       { label:"eBay particular", percentage:11.92, fixedFee:0.35, fixedFeeUnder10:0.05 },
+  wallapop:   { label:"Wallapop", percentage:0, fixedFee:0 },
+  shopify:    { label:"Shopify Basic", percentage:2, fixedFee:0.25 },
+  direct:     { label:"Venta directa", percentage:0, fixedFee:0 }
+};
+const eur = new Intl.NumberFormat("es-ES",{style:"currency",currency:"EUR"});
+const money = n => Number.isFinite(n) ? eur.format(n) : "—";
+const nf2 = new Intl.NumberFormat("es-ES",{maximumFractionDigits:2});
+const pctFmt = n => Number.isFinite(n) ? nf2.format(n)+" %" : "—";
+
+// ===== Capa de datos: nube (D1 vía /api/*) con caché offline en este dispositivo =====
+// La fuente de verdad es el servidor. localStorage es solo:
+//   - una copia para que la app cargue al instante y funcione sin conexión
+//   - una "bandeja de salida" con los cambios hechos offline, que se reenvían al reconectar.
+const DEF_CFG = {ahorro:30, personal:20, reinv:50};
+const LS_CACHE = "premium_cache_v1_" + location.host, LS_OUTBOX = "premium_outbox_v1_" + location.host;
+let nombreTienda = "tienda";
+let MEM = { ops:[], cfg:{...DEF_CFG} };
+let online = false, usuarioEmail = "";
+
+function loadCache(){ try{ const c=JSON.parse(localStorage.getItem(LS_CACHE)||"null"); if(c){ MEM.ops=Array.isArray(c.ops)?c.ops:[]; MEM.cfg=Object.assign({...DEF_CFG}, c.cfg||{}); MEM.user=c.user||""; } }catch(e){} }
+function saveCache(){ try{ localStorage.setItem(LS_CACHE, JSON.stringify(MEM)); }catch(e){} }
+function getOutbox(){ try{ return JSON.parse(localStorage.getItem(LS_OUTBOX)||"[]"); }catch(e){ return []; } }
+function setOutbox(a){ try{ localStorage.setItem(LS_OUTBOX, JSON.stringify(a)); }catch(e){} }
+function enqueue(item){ const a=getOutbox(); a.push(item); setOutbox(a); online=false; }
+
+async function apiGET(){
+  const r=await fetch("/api/premium/state",{cache:"no-store",credentials:"same-origin"});
+  if(r.status===401){ location.href="/panel/"; throw new Error("sin sesión"); }
+  if(r.status===403){ const j=await r.json().catch(()=>({})); bloquea(j.error||"No tienes acceso a la calculadora premium."); throw new Error("sin acceso"); }
+  if(!r.ok) throw new Error("state "+r.status); return r.json();
+}
+function bloquea(msg){
+  document.querySelector(".wrap").innerHTML=`<div class="card bloqueo"><h2 style="color:var(--gold)">Calculadora premium</h2><p>${msg.replace(/[<>&]/g,"")}</p><a class="btn" href="/panel/" style="margin-top:10px">Volver al panel</a></div>`;
+}
+async function apiSend(method, path, body){
+  const r=await fetch(path,{ method, credentials:"same-origin", headers: body?{"content-type":"application/json"}:undefined, body: body?JSON.stringify(body):undefined });
+  if(!r.ok) throw new Error(method+" "+path+" "+r.status);
+  return r.json();
+}
+
+async function flushOutbox(){
+  let a=getOutbox(); if(!a.length) return;
+  const rest=[];
+  for(const it of a){
+    try{
+      if(it.type==="add") await apiSend("POST","/api/premium/ops",it.op);
+      else if(it.type==="remove") await apiSend("DELETE","/api/premium/ops?id="+encodeURIComponent(it.id));
+      else if(it.type==="clear") await apiSend("POST","/api/premium/clear");
+      else if(it.type==="cfg") await apiSend("PUT","/api/premium/cfg",it.cfg);
+      else if(it.type==="replace") await apiSend("POST","/api/premium/replace",it.body);
+    }catch(e){ rest.push(it); }
+  }
+  setOutbox(rest);
+  if(rest.length) throw new Error("quedan "+rest.length+" sin enviar");
+}
+
+async function cargaEstado(){
+  loadCache();
+  try{
+    let s=await apiGET();
+    if(MEM.user && MEM.user!==s.user){ setOutbox([]); }   // otro usuario en este dispositivo: no mezclar datos
+    if(getOutbox().length){ await flushOutbox(); s=await apiGET(); }
+    MEM.user = s.user || "";
+    nombreTienda = s.tienda || "tienda";
+    const mt=document.getElementById("marcaTienda"); if(mt) mt.textContent=nombreTienda;
+    MEM.ops = Array.isArray(s.ops)?s.ops:[];
+    MEM.cfg = Object.assign({...DEF_CFG}, s.cfg||{});
+    usuarioEmail = s.user || "";
+    online = true;
+    saveCache();
+  }catch(e){ online=false; }
+  actualizaEstadoSync();
+}
+
+const Store = {
+  async list(){ return MEM.ops.slice(); },
+  async add(op){ MEM.ops.unshift(op); saveCache(); try{ await apiSend("POST","/api/premium/ops",op); online=true; }catch(e){ enqueue({type:"add",op}); } actualizaEstadoSync(); },
+  async remove(id){ MEM.ops=MEM.ops.filter(o=>o.id!==id); saveCache(); try{ await apiSend("DELETE","/api/premium/ops?id="+encodeURIComponent(id)); online=true; }catch(e){ enqueue({type:"remove",id}); } actualizaEstadoSync(); },
+  async clear(){ MEM.ops=[]; saveCache(); try{ await apiSend("POST","/api/premium/clear"); online=true; }catch(e){ enqueue({type:"clear"}); } actualizaEstadoSync(); },
+  async replaceAll(a){ MEM.ops=Array.isArray(a)?a:[]; saveCache(); try{ await apiSend("POST","/api/premium/replace",{ops:MEM.ops,cfg:MEM.cfg}); online=true; }catch(e){ enqueue({type:"replace",body:{ops:MEM.ops,cfg:MEM.cfg}}); } actualizaEstadoSync(); },
+  getCfg(){ return Object.assign({...DEF_CFG}, MEM.cfg); },
+  setCfg(c){ MEM.cfg=Object.assign({...DEF_CFG},c); saveCache(); apiSend("PUT","/api/premium/cfg",MEM.cfg).then(()=>{online=true;actualizaEstadoSync();}).catch(()=>{ enqueue({type:"cfg",cfg:MEM.cfg}); actualizaEstadoSync(); }); }
+};
+
+function actualizaEstadoSync(){
+  const b=document.getElementById("bannerSync"), txt=document.getElementById("bannerTxt"), q=document.getElementById("quien");
+  const pend=getOutbox().length;
+  if(online && !pend){
+    if(b) b.style.display="none";
+    if(q) q.textContent = usuarioEmail ? ("Sincronizado · "+usuarioEmail) : "Sincronizado";
+  } else {
+    if(b) b.style.display="flex";
+    if(txt) txt.innerHTML = pend
+      ? "<b>Sin sincronizar.</b> Hay "+pend+" cambio(s) guardado(s) en este dispositivo; se enviarán a la nube en cuanto haya conexión."
+      : "<b>Sin conexión con la nube.</b> Mostrando la última copia de este dispositivo.";
+    if(q) q.textContent = "sin conexión";
+  }
+}
+
+function num(id){ const el=document.getElementById(id); if(!el) return 0; const v=parseFloat(el.value); return (Number.isFinite(v)&&v>=0)?v:0; }
+function rellenaPlats(id){ document.getElementById(id).innerHTML = Object.keys(platformFees).map(k=>`<option value="${k}">${platformFees[k].label}</option>`).join(""); }
+function tarifaEfectiva(key, salePrice){ const p=platformFees[key]||platformFees.direct; let f=p.fixedFee; if(key==="ebay"&&salePrice<10&&typeof p.fixedFeeUnder10==="number") f=p.fixedFeeUnder10; return {percentage:p.percentage, fixedFee:f, label:p.label}; }
+
+// ===== Núcleo de cálculo + reparto =====
+function calcula(d){
+  const rate=d.commissionPercentage/100;
+  const valido=rate<1;
+  const commission=d.salePrice*rate + d.fixedFee;
+  const totalExpenses=d.sellerShipping+d.packaging+d.otherExpenses;
+  const netCollection=d.salePrice-commission-totalExpenses;
+  const realProfit=netCollection-d.purchaseCost;
+  const roi=d.purchaseCost>0 ? realProfit/d.purchaseCost : null;
+  let breakEvenPrice=null, targetSalePrice=null;
+  if(valido){
+    breakEvenPrice=(d.purchaseCost+totalExpenses+d.fixedFee)/(1-rate);
+    const t=(d.targetROIPercentage||0)/100;
+    targetSalePrice=(d.purchaseCost*(1+t)+totalExpenses+d.fixedFee)/(1-rate);
+  }
+  return {valido,commission,totalExpenses,netCollection,realProfit,roi,breakEvenPrice,targetSalePrice};
+}
+function reparte(realProfit, netCollection, cfg){
+  const pos=Math.max(0,realProfit);
+  const ahorro=pos*(cfg.ahorro/100), personal=pos*(cfg.personal/100), reinv=pos*(cfg.reinv/100);
+  const maxProxima=Math.max(0, netCollection - ahorro - personal);
+  return {ahorro,personal,reinv,maxProxima};
+}
+
+// ===== Estado UI =====
+let comTocada=false, fijaTocada=false, ultimoCalculo=null;
+
+function refrescaTarifa(){
+  const t=tarifaEfectiva(document.getElementById("plataforma").value, num("venta"));
+  document.getElementById("platTarifa").innerHTML = `${t.label} · <b style="color:var(--gold)">${nf2.format(t.percentage)}%</b>` + (t.fixedFee>0?` + ${money(t.fixedFee)}`:"");
+  if(!comTocada) document.getElementById("comManual").value=t.percentage;
+  if(!fijaTocada) document.getElementById("fijaManual").value=t.fixedFee;
+}
+function pintaCalc(){
+  refrescaTarifa();
+  const cfg=Store.getCfg();
+  const d={ purchaseCost:num("compra"), salePrice:num("venta"), sellerShipping:num("envio"), packaging:num("embalaje"),
+    otherExpenses:num("otros"), commissionPercentage:num("comManual"), fixedFee:num("fijaManual"), targetROIPercentage:num("roiObj") };
+  const r=calcula(d), rep=reparte(r.realProfit, r.netCollection, cfg);
+  const setC=(id,v,cls)=>{const e=document.getElementById(id);e.textContent=v;if(cls!==undefined)e.className="val "+cls;};
+  setC("rBen",money(r.realProfit), r.realProfit>0?"pos":r.realProfit<0?"neg":"");
+  setC("rRoi", r.roi===null?"—":pctFmt(r.roi*100), r.roi===null?"":(r.roi>0?"pos":r.roi<0?"neg":""));
+  document.getElementById("rNeto").textContent=money(r.netCollection);
+  document.getElementById("rCom").textContent=money(r.commission);
+  document.getElementById("rGas").textContent=money(r.totalExpenses);
+  document.getElementById("rAhorro").textContent=money(rep.ahorro);
+  document.getElementById("rPersonal").textContent=money(rep.personal);
+  document.getElementById("rReinv").textContent=money(rep.reinv);
+  document.getElementById("rMax").textContent=money(rep.maxProxima);
+  document.getElementById("rBE").textContent=r.valido?money(r.breakEvenPrice):"—";
+  document.getElementById("rTgtLbl").textContent=`Precio para ROI ${nf2.format(num("roiObj"))}%`;
+  document.getElementById("rTgt").textContent=r.valido?money(r.targetSalePrice):"—";
+  document.getElementById("pAhorro").textContent=cfg.ahorro+"%";
+  document.getElementById("pPersonal").textContent=cfg.personal+"%";
+  document.getElementById("pReinv").textContent=cfg.reinv+"%";
+  ultimoCalculo={d,r,rep};
+}
+
+async function guardarOp(){
+  const {d,r,rep}=ultimoCalculo||{};
+  if(!r || (d.salePrice===0 && d.purchaseCost===0)){ avisa("Introduce al menos compra o venta."); return; }
+  const op={ id:(Date.now()+"-"+Math.random().toString(36).slice(2,7)), fecha:new Date().toISOString(),
+    nombre:document.getElementById("nombre").value.trim(), plataforma:platformFees[document.getElementById("plataforma").value].label,
+    compra:d.purchaseCost, venta:d.salePrice, envio:d.sellerShipping, embalaje:d.packaging, otros:d.otherExpenses,
+    comisionPct:d.commissionPercentage, fija:d.fixedFee,
+    beneficio:r.realProfit, roi:r.roi, neto:r.netCollection, comision:r.commission,
+    ahorro:rep.ahorro, personal:rep.personal, reinv:rep.reinv, maxProxima:rep.maxProxima };
+  await Store.add(op);
+  avisa("Operación guardada.");
+  ["nombre","compra","venta","envio","embalaje","otros"].forEach(id=>document.getElementById(id).value="");
+  comTocada=false; fijaTocada=false; pintaCalc(); pintaPanel();
+}
+
+// ===== Panel =====
+function mismoMes(iso){ const d=new Date(iso), n=new Date(); return d.getFullYear()===n.getFullYear() && d.getMonth()===n.getMonth(); }
+async function pintaPanel(){
+  const ops=await Store.list();
+  const t={ n:ops.length, mes:0, benTotal:0, benMes:0, invertido:0, recuperado:0, ahorro:0, reinv:0, personal:0, roiSum:0, roiN:0 };
+  ops.forEach(o=>{
+    t.benTotal+=o.beneficio||0; t.invertido+=o.compra||0; t.recuperado+=o.neto||0;
+    t.ahorro+=o.ahorro||0; t.reinv+=o.reinv||0; t.personal+=o.personal||0;
+    if(typeof o.roi==="number"){ t.roiSum+=o.roi; t.roiN++; }
+    if(mismoMes(o.fecha)){ t.mes++; t.benMes+=o.beneficio||0; }
+  });
+  const roiMedio=t.roiN>0 ? t.roiSum/t.roiN : null;
+  const tiles=[
+    ["Beneficio total", money(t.benTotal), t.n+" operaciones", t.benTotal>=0?"pos":"neg"],
+    ["Beneficio este mes", money(t.benMes), t.mes+" este mes", t.benMes>=0?"pos":"neg"],
+    ["ROI medio", roiMedio===null?"—":pctFmt(roiMedio*100), "por operación", roiMedio>0?"pos":roiMedio<0?"neg":""],
+    ["Capital invertido", money(t.invertido), "suma de compras", ""],
+    ["Capital recuperado", money(t.recuperado), "cobros netos", ""],
+    ["Ahorro intocable", money(t.ahorro), "acumulado", "oro"],
+    ["Para reinvertir", money(t.reinv), "acumulado", "oro"],
+    ["Beneficio personal", money(t.personal), "acumulado", ""]
+  ];
+  document.getElementById("tiles").innerHTML = tiles.map(x=>
+    `<div class="tile"><div class="t">${x[0]}</div><div class="n ${x[3]}">${x[1]}</div><div class="sub">${x[2]}</div></div>`).join("");
+
+  const tb=document.getElementById("tbody"), vacio=document.getElementById("vacio");
+  if(!ops.length){ tb.innerHTML=""; vacio.style.display="block"; return; }
+  vacio.style.display="none";
+  tb.innerHTML = ops.map(o=>{
+    const f=new Date(o.fecha), fecha=f.getDate()+"/"+(f.getMonth()+1)+"/"+String(f.getFullYear()).slice(2);
+    const cls=o.beneficio>0?"pos":o.beneficio<0?"neg":"";
+    return `<tr>
+      <td>${fecha}</td><td>${(o.nombre||"—").replace(/[<>&]/g,"")}</td><td>${o.plataforma||"—"}</td>
+      <td>${money(o.compra)}</td><td>${money(o.venta)}</td>
+      <td class="${cls}" style="font-weight:700">${money(o.beneficio)}</td>
+      <td>${typeof o.roi==="number"?pctFmt(o.roi*100):"—"}</td>
+      <td><button class="del" data-id="${o.id}" aria-label="Borrar">✕</button></td>
+    </tr>`;
+  }).join("");
+  tb.querySelectorAll(".del").forEach(b=>b.addEventListener("click", async ()=>{ await Store.remove(b.dataset.id); pintaPanel(); avisa("Operación borrada."); }));
+}
+
+// ===== Lotes =====
+function loteAddRow(nombre="", precio=""){
+  const div=document.createElement("div"); div.className="lote-row";
+  div.innerHTML=`<input type="text" placeholder="Nombre" value="${nombre}"><div class="euro"><input type="number" inputmode="decimal" min="0" step="0.01" placeholder="0" value="${precio}"></div><button class="del" aria-label="Quitar">✕</button>`;
+  div.querySelectorAll("input").forEach(i=>i.addEventListener("input", pintaLotes));
+  div.querySelector(".del").addEventListener("click", ()=>{ div.remove(); pintaLotes(); });
+  document.getElementById("loteRows").appendChild(div);
+}
+function pintaLotes(){
+  const coste=num("loteCoste"), metodo=document.getElementById("loteMetodo").value;
+  const rows=[...document.querySelectorAll("#loteRows .lote-row")].map(r=>{
+    const ins=r.querySelectorAll("input"); return {nombre:ins[0].value.trim(), precio:parseFloat(ins[1].value)||0};
+  });
+  const sumaVal=rows.reduce((s,r)=>s+r.precio,0);
+  const body=document.getElementById("loteBody");
+  let repartido=0;
+  body.innerHTML=rows.map(r=>{
+    let asignado=0;
+    if(metodo==="valor") asignado = sumaVal>0 ? coste*(r.precio/sumaVal) : 0;
+    else asignado = rows.length>0 ? coste/rows.length : 0;
+    repartido+=asignado;
+    return `<tr><td>${(r.nombre||"—").replace(/[<>&]/g,"")}</td><td>${money(r.precio)}</td><td style="font-weight:700">${money(asignado)}</td></tr>`;
+  }).join("");
+  document.getElementById("loteTotal").textContent = money(repartido);
+}
+
+// ===== Comparar =====
+function pintaComp(){
+  const compra=num("c_compra");
+  const va=num("c_ventaAhora"), ta=tarifaEfectiva(document.getElementById("c_platAhora").value, va);
+  const comA=va*(ta.percentage/100)+ta.fixedFee, gA=num("c_gastosAhora");
+  const benA=va-comA-gA-compra, recA=va-comA-gA, roiA=compra>0?benA/compra:null;
+  const vf=num("c_ventaFut"), tf=tarifaEfectiva(document.getElementById("c_platFut").value, vf);
+  const comF=vf*(tf.percentage/100)+tf.fixedFee, gF=num("c_gastosFut"), hold=num("c_holding");
+  const benF=vf-comF-gF-hold-compra, roiF=compra>0?benF/compra:null;
+  const dif=benF-benA, hay=va>0||vf>0;
+  const set=(id,v,s)=>{const e=document.getElementById(id);e.textContent=v;if(s!==undefined)e.className="val "+(s>0?"pos":s<0?"neg":"");};
+  set("cn_ben", hay?money(benA):"—", hay?benA:undefined);
+  set("cn_roi", roiA===null?"—":pctFmt(roiA*100), roiA===null?undefined:roiA);
+  set("cn_rec", hay?money(recA):"—");
+  set("ch_ben", hay?money(benF):"—", hay?benF:undefined);
+  set("ch_roi", roiF===null?"—":pctFmt(roiF*100), roiF===null?undefined:roiF);
+  set("ch_dif", hay?money(dif):"—", hay?dif:undefined);
+  const v=document.getElementById("veredicto");
+  if(!hay) v.textContent="Introduce datos para comparar.";
+  else if(Math.abs(dif)<0.005) v.textContent="Ambos escenarios dejan prácticamente lo mismo.";
+  else if(dif>0) v.textContent=`Mantener aportaría ${money(dif)} más en este escenario.`;
+  else v.textContent=`Vender ahora dejaría ${money(-dif)} más que mantener.`;
+}
+
+// ===== Exportar / importar =====
+function descarga(nombre, contenido, tipo){
+  const blob=new Blob([contenido],{type:tipo}); const url=URL.createObjectURL(blob);
+  const a=document.createElement("a"); a.href=url; a.download=nombre; a.click(); URL.revokeObjectURL(url);
+}
+async function expCSV(){
+  const ops=await Store.list(); if(!ops.length){ avisa("No hay operaciones."); return; }
+  const cab=["Fecha","Producto","Plataforma","Compra","Venta","Envio","Embalaje","Otros","Comision%","Fija","Beneficio","ROI%","Neto","Ahorro","Personal","Reinversion","MaxProxima"];
+  const filas=ops.map(o=>[new Date(o.fecha).toLocaleDateString("es-ES"),o.nombre||"",o.plataforma||"",o.compra,o.venta,o.envio,o.embalaje,o.otros,o.comisionPct,o.fija,o.beneficio,(typeof o.roi==="number"?(o.roi*100).toFixed(2):""),o.neto,o.ahorro,o.personal,o.reinv,o.maxProxima]
+    .map(c=>`"${String(c).replace(/"/g,'""')}"`).join(";"));
+  descarga(slugTienda()+"-operaciones.csv", "﻿"+cab.join(";")+"\n"+filas.join("\n"), "text/csv");
+}
+async function expJSON(){ const ops=await Store.list(); descarga(slugTienda()+"-copia.json", JSON.stringify({ops,cfg:Store.getCfg(),exportado:new Date().toISOString()},null,2), "application/json"); }
+
+const slugTienda = () => nombreTienda.toLowerCase().normalize("NFD").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"") || "tienda";
+
+// ===== Ajustes =====
+function cargaCfgUI(){ const c=Store.getCfg(); document.getElementById("cfgAhorro").value=c.ahorro; document.getElementById("cfgPersonal").value=c.personal; document.getElementById("cfgReinv").value=c.reinv; validaCfg(); }
+function validaCfg(){ const s=num("cfgAhorro")+num("cfgPersonal")+num("cfgReinv"); const el=document.getElementById("cfgSuma"); el.textContent="Suma: "+s+"%"+(s===100?" ✓":" (debe ser 100)"); el.style.color = s===100?"var(--ok)":"var(--bad)"; return s===100; }
+
+// ===== Aviso =====
+let relojAviso; function avisa(t){ const el=document.getElementById("aviso"); el.textContent=t; el.classList.add("ver"); clearTimeout(relojAviso); relojAviso=setTimeout(()=>el.classList.remove("ver"),3000); }
+
+// ===== Tabs =====
+function activa(id){
+  const map={panel:"p-panel",calc:"p-calc",lotes:"p-lotes",comp:"p-comp",ajustes:"p-ajustes"};
+  Object.keys(map).forEach(k=>{
+    document.getElementById("t-"+k).setAttribute("aria-selected", k===id);
+    document.getElementById(map[k]).classList.toggle("oculto", k!==id);
+  });
+  if(id==="panel") pintaPanel();
+}
+
+// ===== Color de la tienda =====
+async function aplicaColor(){
+  try{
+    const r=await fetch("/api/yo",{credentials:"same-origin"}); if(!r.ok) return;
+    const j=await r.json(); const c=j.vendedor && j.vendedor.config && j.vendedor.config.color;
+    const m=/^#([0-9a-f]{6})$/i.exec(c||""); if(!m) return;
+    const n=parseInt(m[1],16), rgb=[(n>>16)&255,(n>>8)&255,n&255].join(",");
+    const st=document.documentElement.style;
+    st.setProperty("--gold",c); st.setProperty("--gold-soft","rgba("+rgb+",.12)"); st.setProperty("--gold-line","rgba("+rgb+",.34)");
+  }catch(e){}
+}
+
+// ===== Init =====
+async function init(){
+  rellenaPlats("plataforma"); rellenaPlats("c_platAhora"); rellenaPlats("c_platFut");
+  document.getElementById("plataforma").addEventListener("change",()=>{comTocada=false;fijaTocada=false;pintaCalc();});
+  document.getElementById("comManual").addEventListener("input",()=>{comTocada=true;pintaCalc();});
+  document.getElementById("fijaManual").addEventListener("input",()=>{fijaTocada=true;pintaCalc();});
+  ["nombre","compra","venta","envio","embalaje","otros","roiObj"].forEach(id=>document.getElementById(id).addEventListener("input",pintaCalc));
+  document.getElementById("guardar").addEventListener("click",guardarOp);
+
+  ["c_compra","c_ventaAhora","c_platAhora","c_gastosAhora","c_ventaFut","c_platFut","c_meses","c_holding","c_gastosFut"].forEach(id=>document.getElementById(id).addEventListener("input",pintaComp));
+  document.getElementById("c_platAhora").addEventListener("change",e=>{const f=document.getElementById("c_platFut"); if(!f.dataset.t) f.value=e.target.value; pintaComp();});
+  document.getElementById("c_platFut").addEventListener("change",e=>{e.target.dataset.t="1";});
+
+  document.getElementById("loteAdd").addEventListener("click",()=>loteAddRow());
+  document.getElementById("loteCoste").addEventListener("input",pintaLotes);
+  document.getElementById("loteMetodo").addEventListener("change",pintaLotes);
+  loteAddRow(); loteAddRow(); pintaLotes();
+
+  document.getElementById("expCSV").addEventListener("click",expCSV);
+  document.getElementById("expJSON").addEventListener("click",expJSON);
+  document.getElementById("impJSON").addEventListener("click",()=>document.getElementById("fileJSON").click());
+  document.getElementById("fileJSON").addEventListener("change",e=>{
+    const f=e.target.files[0]; if(!f) return; const rd=new FileReader();
+    rd.onload=async()=>{ try{ const j=JSON.parse(rd.result); if(Array.isArray(j.ops)){ await Store.replaceAll(j.ops); if(j.cfg) Store.setCfg(j.cfg); cargaCfgUI(); pintaPanel(); avisa("Copia importada."); } else avisa("Archivo no válido."); }catch(err){ avisa("Archivo no válido."); } };
+    rd.readAsText(f); e.target.value="";
+  });
+
+  document.getElementById("cfgAhorro").addEventListener("input",validaCfg);
+  document.getElementById("cfgPersonal").addEventListener("input",validaCfg);
+  document.getElementById("cfgReinv").addEventListener("input",validaCfg);
+  document.getElementById("cfgGuardar").addEventListener("click",()=>{ if(!validaCfg()){avisa("El reparto debe sumar 100%.");return;} Store.setCfg({ahorro:num("cfgAhorro"),personal:num("cfgPersonal"),reinv:num("cfgReinv")}); pintaCalc(); avisa("Ajustes guardados."); });
+  document.getElementById("borrarTodo").addEventListener("click",async()=>{ if(confirm("¿Borrar TODAS las operaciones? No se puede deshacer.")){ await Store.clear(); pintaPanel(); avisa("Historial borrado."); } });
+
+  Object.keys({panel:1,calc:1,lotes:1,comp:1,ajustes:1}).forEach(k=>document.getElementById("t-"+k).addEventListener("click",()=>activa(k)));
+
+  aplicaColor();
+  await cargaEstado();
+  if(!document.getElementById("tbody")) return;
+  cargaCfgUI(); pintaCalc(); pintaComp(); pintaPanel();
+  document.addEventListener("visibilitychange",()=>{ if(!document.hidden){ cargaEstado().then(()=>{ cargaCfgUI(); pintaCalc(); pintaPanel(); }); } });
+  window.addEventListener("online",()=>{ cargaEstado().then(()=>{ cargaCfgUI(); pintaCalc(); pintaPanel(); }); });
+  if(location.search.indexOf("selftest")!==-1) selftest();
+}
+
+function selftest(){
+  const ok=[]; const ap=(a,b,t)=>Math.abs(a-b)<(t||0.01);
+  let r=calcula({purchaseCost:100,salePrice:250,sellerShipping:0,packaging:0,otherExpenses:0,commissionPercentage:5,fixedFee:0,targetROIPercentage:50});
+  ok.push(["calc beneficio 137,5",ap(r.realProfit,137.5)]); ok.push(["calc breakeven 105,26",ap(r.breakEvenPrice,105.26,0.05)]); ok.push(["calc ROI50 157,89",ap(r.targetSalePrice,157.89,0.05)]);
+  let rep=reparte(137.5,237.5,{ahorro:30,personal:20,reinv:50});
+  ok.push(["ahorro 41,25",ap(rep.ahorro,41.25)]); ok.push(["personal 27,50",ap(rep.personal,27.5)]); ok.push(["reinv 68,75",ap(rep.reinv,68.75)]); ok.push(["maxProxima 168,75",ap(rep.maxProxima,168.75)]);
+  let rp=reparte(-30,70,{ahorro:30,personal:20,reinv:50});
+  ok.push(["pérdida reparto 0",rp.ahorro===0&&rp.personal===0&&rp.reinv===0]); ok.push(["pérdida maxProxima 70",ap(rp.maxProxima,70)]);
+  const f=ok.filter(x=>!x[1]);
+  console.log("%c[Panel] Pruebas: "+(ok.length-f.length)+"/"+ok.length+" OK","color:"+(f.length?"#e58a7a":"#7dd6a0")+";font-weight:bold");
+  ok.forEach(x=>console.log((x[1]?"✓":"✗")+" "+x[0]));
+}
+document.addEventListener("DOMContentLoaded",init);
+</script>
+</body>
+</html>

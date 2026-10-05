@@ -48,7 +48,7 @@ const filasCartas = cartas.map((c, i) => {
   const precio = typeof c.precio === 'number' ? c.precio : parseFloat(String(c.precio || '').replace(/[^\d,.]/g, '').replace(',', '.')) || null;
   return `INSERT INTO cartas (id, vendedor_id, ref, apartado, nombre, set_detalle, juego, estado_carta, cert, precio, disponibilidad, fotos, orden) VALUES (${[cid, id, c.ref, c.apartado, c.nombre, c.set || '', c.juego || '', c.estado_carta || '', c.cert || '', precio, c.disponibilidad || 'Disponible', JSON.stringify(fotos), i].map(q).join(', ')});`;
 });
-sql.push(`INSERT INTO vendedores (id, nombre, config, prefijo_ref, sig_ref, notas) VALUES (${[id, 'mistercard', JSON.stringify(cfg), 'MC', maxRef + 1, 'Tienda propia (primer vendedor)'].map(q).join(', ')});`);
+sql.push(`INSERT INTO vendedores (id, nombre, config, prefijo_ref, sig_ref, notas, premium) VALUES (${[id, 'mistercard', JSON.stringify(cfg), 'MC', maxRef + 1, 'Tienda propia (primer vendedor)', 1].map(q).join(', ')});`);
 sql.push(...filasCartas);
 sql.push(`INSERT OR IGNORE INTO dominios (host, vendedor_id, estado) VALUES ('mistercard.es', '${id}', 'pendiente'), ('www.mistercard.es', '${id}', 'pendiente');`);
 writeFileSync('importar-mistercard.sql', sql.join('\n') + '\n');
