@@ -1,9 +1,34 @@
 {
   // Configuración para publicar mistercard en Cloudflare Workers.
-  // Es un sitio 100% estático: no hay código, solo se sirven los archivos del repositorio.
+  // Sirve los archivos del repositorio (la web) y, además, un Worker pequeño
+  // (src/index.js) con el catálogo que se publica desde HOLD:
+  //   /api/catalogo y /fotos/<clave>
   "name": "mistercard",
+  "main": "src/index.js",
   "compatibility_date": "2026-09-19",
   "assets": {
-    "directory": "./"
+    "directory": "./",
+    "binding": "ASSETS"
+  },
+
+  // Misma base de datos que HOLD (solo se lee).
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "mistercard_panel",
+      "database_id": "d1293445-53c9-432c-aaff-385ffce687d2"
+    }
+  ],
+
+  // Fotos de los productos (las sube HOLD).
+  "r2_buckets": [
+    { "binding": "PHOTOS", "bucket_name": "hold-fotos" }
+  ],
+
+  // Solo se muestran los productos publicados por esta cuenta de HOLD.
+  // Es el id de su carpeta de fotos (sale en las direcciones /fotos/items/<id>/…),
+  // así no hace falta poner el email en este repositorio público.
+  "vars": {
+    "CATALOG_OWNER_ID": "9fec54d1a16944ed7e741677"
   }
 }

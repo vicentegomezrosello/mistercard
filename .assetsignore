@@ -2,3 +2,9 @@ panel/
 **/.git
 **/node_modules
 **/.DS_Store
+# Código y configuración del Worker: no se publican como archivos de la web
+src/
+scripts/
+wrangler.jsonc
+.dev.vars
+.wrangler/

@@ -15,7 +15,7 @@ public_folder: "/images"
 
 collections:
   # ENCENDER / APAGAR APARTADOS. Un apartado solo se ve en la web si "Mostrar" está activado
-  # Y tiene al menos un producto asignado. Cambia el orden para reordenar las secciones.
+  # Y tiene al menos un producto publicado desde HOLD. Cambia el orden para reordenar las secciones.
   - name: apartados
     label: "Apartados (encender / apagar)"
     files:
@@ -52,45 +52,10 @@ collections:
               - { label: "Mostrar en la web", name: visible, widget: boolean, default: false }
               - { label: "Orden", name: orden, widget: number, default: 4, value_type: int, min: 1 }
 
-  - name: cartas
-    label: "Productos del escaparate"
-    files:
-      - name: listado
-        label: "Listado de productos"
-        file: "content/cartas.json"
-        fields:
-          - label: "Productos"
-            name: cartas
-            widget: list
-            label_singular: "Producto"
-            summary: "[{{fields.apartado}}] {{fields.ref}} — {{fields.nombre}} ({{fields.disponibilidad}})"
-            fields:
-              - label: "Apartado"
-                name: apartado
-                widget: select
-                default: "sueltas"
-                hint: "Sección donde aparece. Debe estar encendida en «Apartados» para verse."
-                options:
-                  - { label: "Cartas gradeadas", value: "gradeadas" }
-                  - { label: "Producto sellado", value: "sellado" }
-                  - { label: "Cartas sueltas", value: "sueltas" }
-                  - { label: "Lotes y colecciones", value: "lotes" }
-              - { label: "Foto principal", name: foto, widget: image, required: false }
-              - label: "Más fotos (reverso, detalles…)"
-                name: fotos
-                widget: list
-                required: false
-                label_singular: "Foto"
-                hint: "Opcional. En la web se pasan tocando la imagen. Sin límite."
-                field: { label: Foto, name: img, widget: image }
-              - { label: "Nombre", name: nombre, widget: string }
-              - { label: "Set / detalle", name: set, widget: string, required: false }
-              - { label: "Juego", name: juego, widget: select, required: false, options: ["Pokémon", "Riftbound", "One Piece", "Lorcana", "Deportivas", "Otro"] }
-              - { label: "Estado", name: estado_carta, widget: string, hint: "Near Mint, Light Play, PSA 10…" }
-              - { label: "Nº de certificación", name: cert, widget: string, required: false, hint: "Solo gradeadas. El número del slab (PSA/CGC/BGS). Vacío en cartas sin gradear." }
-              - { label: "Precio (€)", name: precio, widget: number, value_type: float, min: 0, step: 1, hint: "Solo el número, sin €. Ej: 89. La web añade el € sola." }
-              - { label: "Disponibilidad", name: disponibilidad, widget: select, options: ["Disponible", "Reservada", "Vendida"], default: "Disponible" }
-              - { label: "Referencia", name: ref, widget: string, pattern: ["^MC-[0-9]{3}$", "Formato MC-000 (ej. MC-010)"], hint: "Formato MC-000. Usa el siguiente número libre (ej. MC-010)." }
+  # PRODUCTOS DEL ESCAPARATE: ya NO se editan aquí.
+  # Desde la fase 2 se publican desde HOLD (hold.mistercard.es → ficha del producto →
+  # "Publicar en mistercard.es"). content/cartas.json solo queda como copia de respaldo
+  # por si la API fallara, así que se ha quitado de este panel para no editar en dos sitios.
 
   - name: sitio
     label: "Textos de la web"
