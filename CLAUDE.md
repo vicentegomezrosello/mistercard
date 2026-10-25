@@ -45,3 +45,9 @@ Para cambios visuales, abre la página con Playwright (está preinstalado) y rev
 - `worker-api`: Worker, D1, R2 y `wrangler.jsonc`.
 - `frontend`: `index.html`, la calculadora, SEO y el panel CMS.
 - `reviewer`: revisión de seguridad y de contratos antes de push. Solo lectura.
+
+Marketing:
+
+- `seo`: SEO técnico y local, metadatos, JSON-LD, sitemap y robots.
+- `copy`: textos y conversión a DM en `content/sitio.json` y `content/apartados.json`.
+- `redes`: contenido de Instagram y WhatsApp a partir del stock real. No toca el repo.
