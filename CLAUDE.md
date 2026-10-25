@@ -45,3 +45,6 @@ Para cambios visuales, abre la página con Playwright (está preinstalado) y rev
 - `worker-api`: Worker, D1, R2 y `wrangler.jsonc`.
 - `frontend`: `index.html`, la calculadora, SEO y el panel CMS.
 - `reviewer`: revisión de seguridad y de contratos antes de push. Solo lectura.
+- `qa-visual`: pruebas con Playwright en móvil y escritorio, casos de API (vacía, error, XSS), accesibilidad y SEO. No modifica el repo.
+
+La D1 y el R2 los define el repo `hold` (`schema.sql`). Si un cambio aquí necesita columnas nuevas, se hacen allí primero.
