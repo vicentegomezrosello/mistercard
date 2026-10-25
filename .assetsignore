@@ -8,3 +8,6 @@ scripts/
 wrangler.jsonc
 .dev.vars
 .wrangler/
+# Configuración de Claude Code: no se publica en la web
+.claude/
+CLAUDE.md
